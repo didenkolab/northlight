@@ -42,3 +42,9 @@ def reserve(calendar: list, booking: "Booking") -> dict:
         if taken.berth == booking.berth and overlaps(taken, booking.start, booking.end):
             return {"ok": False, "reason": "berth taken", "clash": taken.ref, "calendar": calendar}
     return {"ok": True, "booking": booking, "calendar": calendar + [booking]}
+
+
+def free_berths(calendar: list, berths, start: dt.date, end: dt.date) -> list:
+    """The berths with nothing in them for the whole of a stay."""
+    taken = {b.berth for b in calendar if overlaps(b, start, end)}
+    return [berth for berth in berths if berth not in taken]

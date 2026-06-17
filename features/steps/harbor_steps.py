@@ -67,3 +67,13 @@ def step_refusal_names(context, ref):
 @then("the calendar holds {refs}")
 def step_calendar_holds(context, refs):
     assert [b.ref for b in context.calendar] == _names(refs), context.calendar
+
+
+@when("the office asks which berths are free from {start} to {end}")
+def step_asks_free(context, start, end):
+    context.free = booking.free_berths(context.calendar, context.berths, _day(start), _day(end))
+
+
+@then("the free berths are {names}")
+def step_free_berths_are(context, names):
+    assert context.free == _names(names), context.free
