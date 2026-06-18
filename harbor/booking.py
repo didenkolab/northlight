@@ -30,8 +30,13 @@ def nights(start: dt.date, end: dt.date) -> int:
 
 
 def overlaps(taken: "Booking", start: dt.date, end: dt.date) -> bool:
-    """True when a stay from start to end wants a night the booking already has."""
-    return taken.start <= end and start <= taken.end
+    """True when a stay from start to end wants a night the booking already has.
+
+    Both ranges end on the morning the boat leaves, and that morning is not a night, so
+    a stay beginning on the day another one ends is not a clash. Comparing the dates as
+    if they were inclusive kept a berth off the market for a night nobody was in it.
+    """
+    return taken.start < end and start < taken.end
 
 
 def reserve(calendar: list, booking: "Booking") -> dict:

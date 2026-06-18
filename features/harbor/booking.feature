@@ -24,3 +24,9 @@ Feature: Berth booking
     Given Kittiwake has berth A1 from 2026-07-01 to 2026-07-05 as H-1001
     When the office asks which berths are free from 2026-07-02 to 2026-07-04
     Then the free berths are A2 and B7
+
+  @HARBOR-BKG-003
+  Scenario: The morning a boat leaves, its berth is somebody else's night
+    Given Kittiwake has berth A1 from 2026-07-01 to 2026-07-05 as H-1001
+    When Puffin books berth A1 from 2026-07-05 to 2026-07-09 as H-1002
+    Then the booking is taken
