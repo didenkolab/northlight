@@ -7,7 +7,7 @@ import datetime as dt
 
 from behave import given, step, then, when
 
-from harbor import booking
+from harbor import booking, invoice
 
 
 def _names(text):
@@ -30,6 +30,7 @@ def step_marina_has_berths(context, names):
     context.berths = _names(names)
     context.calendar = []
     context.holds = []
+    context.rates = []
     context.result = None
 
 
@@ -77,3 +78,24 @@ def step_asks_free(context, start, end):
 @then("the free berths are {names}")
 def step_free_berths_are(context, names):
     assert context.free == _names(names), context.free
+
+
+@given("the marina charges {cents:d} cents a night from {day}")
+def step_night_rate(context, cents, day):
+    context.rates = context.rates + [(_day(day), cents)]
+
+
+@when("the invoice for {ref} is made out as {number}")
+def step_invoice_for(context, ref, number):
+    made = next(b for b in context.calendar if b.ref == ref)
+    context.invoice = invoice.invoice_for(made, context.rates[0][1], number, _day("2026-07-06"))
+
+
+@then("the invoice totals {cents:d} cents")
+def step_invoice_totals(context, cents):
+    assert invoice.total_cents(context.invoice) == cents, context.invoice
+
+
+@then("the invoice is numbered {number}")
+def step_invoice_numbered(context, number):
+    assert context.invoice.number == number, context.invoice
