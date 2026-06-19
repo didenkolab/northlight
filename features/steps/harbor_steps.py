@@ -80,6 +80,33 @@ def step_free_berths_are(context, names):
     assert context.free == _names(names), context.free
 
 
+SPREADSHEET = [{"berth": " A1 ", "length": "9,5", "note2": "16A"},
+               {"berth": "A2", "length": "12,0", "note2": ""},
+               {"berth": "B7", "length": "7,25", "note2": " 10A "}]
+
+
+@when("the marina's berth spreadsheet is imported")
+def step_import_spreadsheet(context):
+    context.read_berths = booking.berths_from_rows(SPREADSHEET)
+
+
+@then("the berths read are {names}")
+def step_berths_read(context, names):
+    assert [b["berth"] for b in context.read_berths] == _names(names), context.read_berths
+
+
+@then("berth {berth} has shore power")
+def step_has_power(context, berth):
+    found = next(b for b in context.read_berths if b["berth"] == berth)
+    assert found["power"] is True, found
+
+
+@then("berth {berth} has no shore power")
+def step_has_no_power(context, berth):
+    found = next(b for b in context.read_berths if b["berth"] == berth)
+    assert found["power"] is False, found
+
+
 @given("the marina charges {cents:d} cents a night from {day}")
 def step_night_rate(context, cents, day):
     context.rates = context.rates + [(_day(day), cents)]

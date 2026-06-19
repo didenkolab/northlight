@@ -53,3 +53,20 @@ def free_berths(calendar: list, berths, start: dt.date, end: dt.date) -> list:
     """The berths with nothing in them for the whole of a stay."""
     taken = {b.berth for b in calendar if overlaps(b, start, end)}
     return [berth for berth in berths if berth not in taken]
+
+
+def berths_from_rows(rows) -> list:
+    """The marina's own spreadsheet, as berths.
+
+    Their file writes lengths with a comma for a decimal point and keeps shore power in
+    a column called `note2`, which is a column name and not a mistake: an empty cell
+    means the berth has no power on it.
+    """
+    berths = []
+    for row in rows:
+        berths.append({
+            "berth": row["berth"].strip(),
+            "metres": float(row["length"].strip().replace(",", ".")),
+            "power": bool(row.get("note2", "").strip()),
+        })
+    return berths

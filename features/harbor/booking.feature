@@ -30,3 +30,9 @@ Feature: Berth booking
     Given Kittiwake has berth A1 from 2026-07-01 to 2026-07-05 as H-1001
     When Puffin books berth A1 from 2026-07-05 to 2026-07-09 as H-1002
     Then the booking is taken
+
+  Scenario: The marina's own spreadsheet becomes a berth list
+    When the marina's berth spreadsheet is imported
+    Then the berths read are A1, A2 and B7
+    And berth A1 has shore power
+    And berth A2 has no shore power
