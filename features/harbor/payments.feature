@@ -13,3 +13,10 @@ Feature: What a stay costs and who pays for it
     When the invoice for H-1001 is made out as 2026-0001
     Then the invoice totals 18000 cents
     And the invoice is numbered 2026-0001
+
+  @HARBOR-PAY-002
+  Scenario: The rate on the day of the booking, not today's
+    Given the marina charges 5200 cents a night from 2026-08-01
+    And Kittiwake has berth A1 from 2026-07-01 to 2026-07-05 as H-1001
+    When the invoice for H-1001 is made out as 2026-0002
+    Then the invoice totals 18000 cents

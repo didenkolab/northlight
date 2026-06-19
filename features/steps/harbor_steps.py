@@ -88,7 +88,7 @@ def step_night_rate(context, cents, day):
 @when("the invoice for {ref} is made out as {number}")
 def step_invoice_for(context, ref, number):
     made = next(b for b in context.calendar if b.ref == ref)
-    context.invoice = invoice.invoice_for(made, context.rates[0][1], number, _day("2026-07-06"))
+    context.invoice = invoice.invoice_for(made, context.rates, number, _day("2026-07-06"))
 
 
 @then("the invoice totals {cents:d} cents")

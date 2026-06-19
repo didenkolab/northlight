@@ -39,8 +39,23 @@ def total_cents(invoice: "Invoice") -> int:
     return sum(line_cents(line) for line in invoice.lines)
 
 
-def invoice_for(booking, night_cents: int, number: str, issued: dt.date) -> "Invoice":
-    """One line, for the nights the boat is here."""
+def invoice_for(booking, rates, number: str, issued: dt.date) -> "Invoice":
+    """One line, for the nights the boat is here, at the rate on the day it was booked."""
     stayed = booking_module.nights(booking.start, booking.end)
+    night_cents = rate_on(rates, booking.start)
     line = Line("Berth %s, %d nights" % (booking.berth, stayed), stayed, night_cents)
     return Invoice(number, booking.ref, (line,), issued)
+
+
+def rate_on(rates, day: dt.date) -> int:
+    """The rate the marina was charging on that day.
+
+    `rates` is a list of (from_date, cents) in any order, and the newest one that had
+    already started on `day` is the one that applies. A price change in August is not
+    allowed to reprice a booking made in June, which is what happens if the invoice
+    reaches for whatever the current rate happens to be.
+    """
+    applicable = [(start, cents) for start, cents in rates if start <= day]
+    if not applicable:
+        raise ValueError("no rate applies on %s" % day)
+    return max(applicable)[1]
