@@ -9,3 +9,9 @@ Feature: Invoice numbers and the lines under them
   Scenario: Invoice numbers run without a gap in them
     When 3 invoices are numbered for 2026
     Then the numbers are 2026-0001, 2026-0002 and 2026-0003
+
+  @LEDGER-INV-002
+  Scenario: A new business year starts the sequence again
+    Given 2 invoices are numbered for 2026
+    When 1 invoice is numbered for 2027
+    Then the numbers are 2026-0001, 2026-0002 and 2027-0001

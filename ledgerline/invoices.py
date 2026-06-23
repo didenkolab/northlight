@@ -9,10 +9,11 @@ import dataclasses as dc
 
 
 def next_number(sequence: dict, year: int) -> dict:
-    """The next invoice number, and the sequence to keep for the one after it.
+    """The next invoice number for a business year, and the sequence to keep.
 
-    The caller stores what it is given back rather than counting for itself, because two
-    people counting is how a sequence grows a gap.
+    Each business year has its own unbroken run: 2026-0001 up, and then 2027-0001, not
+    2027-0349. The caller stores what it is given back rather than counting for itself,
+    because two people counting is how a sequence grows a gap.
     """
-    used = sequence.get("last", 0) + 1
-    return {"number": "%d-%04d" % (year, used), "sequence": {"last": used}}
+    used = sequence.get(year, 0) + 1
+    return {"number": "%d-%04d" % (year, used), "sequence": {**sequence, year: used}}
