@@ -70,3 +70,29 @@ def berths_from_rows(rows) -> list:
             "power": bool(row.get("note2", "").strip()),
         })
     return berths
+
+
+@dc.dataclass(frozen=True)
+class Hold:
+    """A berth kept back for a guest who is typing a card number."""
+
+    ref: str
+    berth: str
+    start: dt.date
+    end: dt.date
+    until: dt.datetime
+
+
+def hold(calendar: list, holds: list, hold_ref: str, berth: str, start: dt.date,
+         end: dt.date, at: dt.datetime, minutes: int = 20) -> dict:
+    """Keep a berth for twenty minutes while the guest pays for it.
+
+    A hold that has run out is not a hold, so the ones that expired before `at` are
+    dropped rather than swept up later by something that has to be remembered.
+    """
+    live = [h for h in holds if h.until > at]
+    for taken in calendar:
+        if taken.berth == berth and overlaps(taken, start, end):
+            return {"ok": False, "reason": "berth taken", "clash": taken.ref, "holds": live}
+    kept = Hold(hold_ref, berth, start, end, at + dt.timedelta(minutes=minutes))
+    return {"ok": True, "hold": kept, "holds": live + [kept]}

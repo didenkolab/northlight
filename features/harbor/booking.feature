@@ -36,3 +36,9 @@ Feature: Berth booking
     Then the berths read are A1, A2 and B7
     And berth A1 has shore power
     And berth A2 has no shore power
+
+  @HARBOR-BKG-006
+  Scenario: A berth is held for twenty minutes while the guest pays
+    When Puffin holds berth A2 from 2026-07-01 to 2026-07-03 as H-1003 at 10:00
+    Then the hold is taken
+    And the hold runs out at 10:20

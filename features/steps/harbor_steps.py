@@ -107,6 +107,29 @@ def step_has_no_power(context, berth):
     assert found["power"] is False, found
 
 
+@step("{boat} holds berth {berth} from {start} to {end} as {ref} at {clock}")
+def step_holds_berth(context, boat, berth, start, end, ref, clock):
+    context.result = booking.hold(context.calendar, context.holds, ref, berth,
+                                  _day(start), _day(end), _clock(clock))
+    context.holds = context.result["holds"]
+
+
+@then("the hold is taken")
+def step_hold_taken(context):
+    assert context.result["ok"] is True, context.result
+
+
+@then("the hold runs out at {clock}")
+def step_hold_runs_out(context, clock):
+    assert context.result["hold"].until == _clock(clock), context.result
+
+
+@then("the hold is refused because {reason}")
+def step_hold_refused(context, reason):
+    assert context.result["ok"] is False, context.result
+    assert context.result["reason"] == reason, context.result
+
+
 @given("the marina charges {cents:d} cents a night from {day}")
 def step_night_rate(context, cents, day):
     context.rates = context.rates + [(_day(day), cents)]
