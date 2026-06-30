@@ -7,7 +7,7 @@ import datetime as dt
 
 from behave import given, step, then, when
 
-from harbor import booking, invoice
+from harbor import booking, invoice, payments
 
 
 def _names(text):
@@ -31,6 +31,8 @@ def step_marina_has_berths(context, names):
     context.calendar = []
     context.holds = []
     context.rates = []
+    context.ledger = []
+    context.tokens = {}
     context.result = None
 
 
@@ -149,3 +151,15 @@ def step_invoice_totals(context, cents):
 @then("the invoice is numbered {number}")
 def step_invoice_numbered(context, number):
     assert context.invoice.number == number, context.invoice
+
+
+@step("{ref} is confirmed for {cents:d} cents")
+def step_confirmed(context, ref, cents):
+    context.result = payments.capture(context.ledger, ref, cents,
+                                      "ch-%d" % (len(context.ledger) + 1))
+    context.ledger = context.result["ledger"]
+
+
+@then("the card has been charged {cents:d} cents for {ref}")
+def step_card_charged(context, cents, ref):
+    assert payments.charged_cents(context.ledger, ref) == cents, context.ledger

@@ -20,3 +20,8 @@ Feature: What a stay costs and who pays for it
     And Kittiwake has berth A1 from 2026-07-01 to 2026-07-05 as H-1001
     When the invoice for H-1001 is made out as 2026-0002
     Then the invoice totals 18000 cents
+
+  @HARBOR-PAY-003
+  Scenario: The card is charged when the booking is confirmed
+    When H-1001 is confirmed for 18000 cents
+    Then the card has been charged 18000 cents for H-1001
