@@ -25,3 +25,9 @@ Feature: What a stay costs and who pays for it
   Scenario: The card is charged when the booking is confirmed
     When H-1001 is confirmed for 18000 cents
     Then the card has been charged 18000 cents for H-1001
+
+  Scenario: The guest comes back from the bank's page to their own booking
+    Given H-1001 sends the guest away to pay with token tok-9
+    And H-1002 sends the guest away to pay with token tok-4
+    When the guest comes back with token tok-9
+    Then they are put back on booking H-1001

@@ -34,3 +34,20 @@ def charged_cents(ledger: list, booking_ref: str) -> int:
 def charges_for(ledger: list, booking_ref: str) -> list:
     """Every movement of money for a booking, oldest first."""
     return [c for c in ledger if c.booking_ref == booking_ref]
+
+
+def start(pending: dict, booking_ref: str, token: str) -> dict:
+    """The guest leaves for the bank's own page. `token` is what will come back."""
+    return {"ok": True, "pending": {**pending, token: booking_ref}}
+
+
+def resume(pending: dict, token: str) -> dict:
+    """Hand the guest back to the booking they went away to pay for.
+
+    The bank's page returns them to us with nothing but the token, and a guest who comes
+    back to the wrong booking -- or to a list -- has to work out for themselves whether
+    they paid.
+    """
+    if token not in pending:
+        return {"ok": False, "reason": "unknown token"}
+    return {"ok": True, "booking_ref": pending[token]}

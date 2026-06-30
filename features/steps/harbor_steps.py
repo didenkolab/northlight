@@ -163,3 +163,19 @@ def step_confirmed(context, ref, cents):
 @then("the card has been charged {cents:d} cents for {ref}")
 def step_card_charged(context, cents, ref):
     assert payments.charged_cents(context.ledger, ref) == cents, context.ledger
+
+
+@given("{ref} sends the guest away to pay with token {token}")
+def step_sends_away(context, ref, token):
+    context.tokens = payments.start(context.tokens, ref, token)["pending"]
+
+
+@when("the guest comes back with token {token}")
+def step_comes_back(context, token):
+    context.result = payments.resume(context.tokens, token)
+
+
+@then("they are put back on booking {ref}")
+def step_put_back_on(context, ref):
+    assert context.result["ok"], context.result
+    assert context.result["booking_ref"] == ref, context.result
