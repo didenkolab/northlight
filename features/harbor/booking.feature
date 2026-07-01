@@ -42,3 +42,8 @@ Feature: Berth booking
     When Puffin holds berth A2 from 2026-07-01 to 2026-07-03 as H-1003 at 10:00
     Then the hold is taken
     And the hold runs out at 10:20
+
+  Scenario: A cancelled booking gives its nights back to the free list
+    Given Kittiwake has berth A1 from 2026-07-01 to 2026-07-05 as H-1001
+    When booking H-1001 is cancelled
+    Then the free berths from 2026-07-02 to 2026-07-04 are A1, A2 and B7

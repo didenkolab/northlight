@@ -96,3 +96,12 @@ def hold(calendar: list, holds: list, hold_ref: str, berth: str, start: dt.date,
             return {"ok": False, "reason": "berth taken", "clash": taken.ref, "holds": live}
     kept = Hold(hold_ref, berth, start, end, at + dt.timedelta(minutes=minutes))
     return {"ok": True, "hold": kept, "holds": live + [kept]}
+
+
+def cancel(calendar: list, ref: str) -> dict:
+    """Take a booking off the calendar. Cancelling twice is not cancelling twice as
+    hard; the second time is a refusal, because somebody may have taken the nights."""
+    kept = [b for b in calendar if b.ref != ref]
+    if len(kept) == len(calendar):
+        return {"ok": False, "reason": "no such booking", "calendar": calendar}
+    return {"ok": True, "calendar": kept}

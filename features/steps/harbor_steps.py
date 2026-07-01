@@ -132,6 +132,19 @@ def step_hold_refused(context, reason):
     assert context.result["reason"] == reason, context.result
 
 
+@when("booking {ref} is cancelled")
+def step_cancel_booking(context, ref):
+    context.result = booking.cancel(context.calendar, ref)
+    assert context.result["ok"], context.result
+    context.calendar = context.result["calendar"]
+
+
+@then("the free berths from {start} to {end} are {names}")
+def step_free_between(context, start, end, names):
+    free = booking.free_berths(context.calendar, context.berths, _day(start), _day(end))
+    assert free == _names(names), free
+
+
 @given("the marina charges {cents:d} cents a night from {day}")
 def step_night_rate(context, cents, day):
     context.rates = context.rates + [(_day(day), cents)]
