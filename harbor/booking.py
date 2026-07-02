@@ -89,11 +89,19 @@ def hold(calendar: list, holds: list, hold_ref: str, berth: str, start: dt.date,
 
     A hold that has run out is not a hold, so the ones that expired before `at` are
     dropped rather than swept up later by something that has to be remembered.
+
+    A berth somebody else is holding is as unavailable as a berth somebody else has
+    booked. Looking only at the calendar meant two guests who clicked within the same
+    minute were both told to go and pay, and one of them was going to be turned away at
+    the pontoon.
     """
     live = [h for h in holds if h.until > at]
     for taken in calendar:
         if taken.berth == berth and overlaps(taken, start, end):
             return {"ok": False, "reason": "berth taken", "clash": taken.ref, "holds": live}
+    for other in live:
+        if other.berth == berth and other.start < end and start < other.end:
+            return {"ok": False, "reason": "berth held", "clash": other.ref, "holds": live}
     kept = Hold(hold_ref, berth, start, end, at + dt.timedelta(minutes=minutes))
     return {"ok": True, "hold": kept, "holds": live + [kept]}
 

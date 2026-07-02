@@ -47,3 +47,8 @@ Feature: Berth booking
     Given Kittiwake has berth A1 from 2026-07-01 to 2026-07-05 as H-1001
     When booking H-1001 is cancelled
     Then the free berths from 2026-07-02 to 2026-07-04 are A1, A2 and B7
+
+  Scenario: Two guests clicking at the same moment do not both get the berth
+    Given Puffin holds berth A2 from 2026-07-01 to 2026-07-03 as H-1003 at 10:00
+    When Guillemot holds berth A2 from 2026-07-02 to 2026-07-04 as H-1004 at 10:01
+    Then the hold is refused because berth held
