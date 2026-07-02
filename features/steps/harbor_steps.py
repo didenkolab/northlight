@@ -169,13 +169,25 @@ def step_invoice_numbered(context, number):
 @step("{ref} is confirmed for {cents:d} cents")
 def step_confirmed(context, ref, cents):
     context.result = payments.capture(context.ledger, ref, cents,
-                                      "ch-%d" % (len(context.ledger) + 1))
+                                      "ch-%d" % (len(context.ledger) + 1), ref)
     context.ledger = context.result["ledger"]
 
 
 @then("the card has been charged {cents:d} cents for {ref}")
 def step_card_charged(context, cents, ref):
     assert payments.charged_cents(context.ledger, ref) == cents, context.ledger
+
+
+@step("{ref} is confirmed for {cents:d} cents with intent {intent}")
+def step_confirmed_with_intent(context, ref, cents, intent):
+    context.result = payments.capture(context.ledger, ref, cents,
+                                      "ch-%d" % (len(context.ledger) + 1), intent)
+    context.ledger = context.result["ledger"]
+
+
+@then("the ledger holds {count:d} charges")
+def step_ledger_holds(context, count):
+    assert len(context.ledger) == count, context.ledger
 
 
 @given("{ref} sends the guest away to pay with token {token}")

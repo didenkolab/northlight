@@ -11,19 +11,33 @@ import dataclasses as dc
 
 @dc.dataclass(frozen=True)
 class Charge:
-    """One movement of money for one booking."""
+    """One movement of money for one booking.
+
+    `intent` is what the confirmation said it was for. Two confirmations of the same
+    booking by the same guest carry the same intention, however many times the button
+    was pressed, and that is what tells a retry apart from a second stay.
+    """
 
     reference: str
     booking_ref: str
     amount_cents: int
+    intent: str = ""
 
 
-def capture(ledger: list, booking_ref: str, amount_cents: int, reference: str) -> dict:
-    """Charge the card when the booking is confirmed."""
+def capture(ledger: list, booking_ref: str, amount_cents: int, reference: str,
+            intent: str) -> dict:
+    """Charge the card when the booking is confirmed.
+
+    The confirmation carries an intention, so a guest who presses the button again gets
+    back the charge that was already taken rather than a second one.
+    """
     if amount_cents <= 0:
         return {"ok": False, "reason": "nothing to charge", "ledger": ledger}
-    charge = Charge(reference, booking_ref, amount_cents)
-    return {"ok": True, "charge": charge, "ledger": ledger + [charge]}
+    last = ledger[-1] if ledger else None
+    if last is not None and last.booking_ref == booking_ref and last.intent == intent:
+        return {"ok": True, "charge": last, "repeat": True, "ledger": ledger}
+    charge = Charge(reference, booking_ref, amount_cents, intent)
+    return {"ok": True, "charge": charge, "repeat": False, "ledger": ledger + [charge]}
 
 
 def charged_cents(ledger: list, booking_ref: str) -> int:

@@ -31,3 +31,11 @@ Feature: What a stay costs and who pays for it
     And H-1002 sends the guest away to pay with token tok-4
     When the guest comes back with token tok-9
     Then they are put back on booking H-1001
+
+  @HARBOR-PAY-005
+  Scenario: A retried confirmation charges the card once
+    Given H-1001 is confirmed for 18000 cents with intent conf-1
+    And H-1043 is confirmed for 9000 cents with intent conf-2
+    When H-1001 is confirmed for 18000 cents with intent conf-1
+    Then the card has been charged 18000 cents for H-1001
+    And the ledger holds 2 charges
