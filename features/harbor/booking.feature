@@ -52,3 +52,9 @@ Feature: Berth booking
     Given Puffin holds berth A2 from 2026-07-01 to 2026-07-03 as H-1003 at 10:00
     When Guillemot holds berth A2 from 2026-07-02 to 2026-07-04 as H-1004 at 10:01
     Then the hold is refused because berth held
+
+  @HARBOR-BKG-005
+  Scenario: The free berths come back in the marina's own order
+    Given the marina has berths B7, A2 and A1
+    When the office asks which berths are free from 2026-07-02 to 2026-07-04
+    Then the free berths are A1, A2 and B7

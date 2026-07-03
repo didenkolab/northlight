@@ -50,9 +50,13 @@ def reserve(calendar: list, booking: "Booking") -> dict:
 
 
 def free_berths(calendar: list, berths, start: dt.date, end: dt.date) -> list:
-    """The berths with nothing in them for the whole of a stay."""
+    """The berths with nothing in them for the whole of a stay, in berth order.
+
+    The harbour office reads this list down a screen and off a printout, so the order is
+    the marina's own and not whatever order the berths happened to be loaded in.
+    """
     taken = {b.berth for b in calendar if overlaps(b, start, end)}
-    return [berth for berth in berths if berth not in taken]
+    return sorted(berth for berth in berths if berth not in taken)
 
 
 def berths_from_rows(rows) -> list:
