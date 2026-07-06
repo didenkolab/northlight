@@ -15,3 +15,11 @@ Feature: Invoice numbers and the lines under them
     Given 2 invoices are numbered for 2026
     When 1 invoice is numbered for 2027
     Then the numbers are 2026-0001, 2026-0002 and 2027-0001
+
+  @LEDGER-INV-003
+  Scenario: Every line shows the tax it is charged
+    When an invoice is composed for Bergstrom Accounting
+      | description | quantity | unit_cents | tax_percent |
+      | Bookkeeping | 10       | 8000       | 25          |
+      | Year end    | 1        | 45000      | 25          |
+    Then line 1 shows 80000 net, 20000 tax and 100000 gross

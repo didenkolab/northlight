@@ -34,3 +34,21 @@ def step_number_invoices(context, count, year):
 @then("the numbers are {numbers}")
 def step_numbers_are(context, numbers):
     assert context.numbers == _names(numbers), context.numbers
+
+
+def _invoice_lines(table):
+    return [invoices.Line(row["description"], int(row["quantity"]), int(row["unit_cents"]),
+                          int(row["tax_percent"])) for row in table]
+
+
+@when("an invoice is composed for {customer}")
+def step_compose_invoice(context, customer):
+    context.invoice = invoices.compose("2026-0001", customer, _invoice_lines(context.table))
+
+
+@then("line {index:d} shows {net:d} net, {tax_amount:d} tax and {gross:d} gross")
+def step_line_shows(context, index, net, tax_amount, gross):
+    line = context.invoice["lines"][index - 1]
+    assert line["net_cents"] == net, line
+    assert line["tax_cents"] == tax_amount, line
+    assert line["gross_cents"] == gross, line
