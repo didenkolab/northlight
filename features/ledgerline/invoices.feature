@@ -23,3 +23,11 @@ Feature: Invoice numbers and the lines under them
       | Bookkeeping | 10       | 8000       | 25          |
       | Year end    | 1        | 45000      | 25          |
     Then line 1 shows 80000 net, 20000 tax and 100000 gross
+
+  @LEDGER-INV-004
+  Scenario: The totals underneath add the lines up
+    When an invoice is composed for Bergstrom Accounting
+      | description | quantity | unit_cents | tax_percent |
+      | Bookkeeping | 10       | 8000       | 25          |
+      | Year end    | 1        | 45000      | 25          |
+    Then the invoice totals 125000 net, 31250 tax and 156250 gross

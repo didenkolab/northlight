@@ -52,3 +52,12 @@ def compose(number: str, customer: str, lines) -> dict:
                    "net_cents": net_cents(line), "tax_cents": tax_cents(line),
                    "gross_cents": gross_cents(line)} for line in lines],
     }
+
+
+def totals(invoice: dict) -> dict:
+    """The three numbers under the table, each of them the sum of the column above it."""
+    return {
+        "net_cents": sum(line["net_cents"] for line in invoice["lines"]),
+        "tax_cents": sum(line["tax_cents"] for line in invoice["lines"]),
+        "gross_cents": sum(line["gross_cents"] for line in invoice["lines"]),
+    }

@@ -52,3 +52,11 @@ def step_line_shows(context, index, net, tax_amount, gross):
     assert line["net_cents"] == net, line
     assert line["tax_cents"] == tax_amount, line
     assert line["gross_cents"] == gross, line
+
+
+@then("the invoice totals {net:d} net, {tax_amount:d} tax and {gross:d} gross")
+def step_invoice_totals(context, net, tax_amount, gross):
+    got = invoices.totals(context.invoice)
+    assert got["net_cents"] == net, got
+    assert got["tax_cents"] == tax_amount, got
+    assert got["gross_cents"] == gross, got
