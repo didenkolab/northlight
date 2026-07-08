@@ -36,6 +36,21 @@ def step_numbers_are(context, numbers):
     assert context.numbers == _names(numbers), context.numbers
 
 
+@when("two invoices are numbered from one reading of the sequence for {year:d}")
+def step_two_from_one_reading(context, year):
+    read = context.sequence.get(year, 0)
+    first = invoices.next_number(context.sequence, year, expect=read)
+    assert first["ok"], first
+    context.sequence = first["sequence"]
+    context.result = invoices.next_number(context.sequence, year, expect=read)
+
+
+@then("the second one is refused because {reason}")
+def step_second_refused(context, reason):
+    assert context.result["ok"] is False, context.result
+    assert context.result["reason"] == reason, context.result
+
+
 def _invoice_lines(table):
     return [invoices.Line(row["description"], int(row["quantity"]), int(row["unit_cents"]),
                           int(row["tax_percent"])) for row in table]

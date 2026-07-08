@@ -31,3 +31,8 @@ Feature: Invoice numbers and the lines under them
       | Bookkeeping | 10       | 8000       | 25          |
       | Year end    | 1        | 45000      | 25          |
     Then the invoice totals 125000 net, 31250 tax and 156250 gross
+
+  Scenario: Two invoices numbered from the same reading do not get the same number
+    Given 1 invoice is numbered for 2026
+    When two invoices are numbered from one reading of the sequence for 2026
+    Then the second one is refused because the sequence has moved on

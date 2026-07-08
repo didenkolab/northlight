@@ -8,15 +8,22 @@ from __future__ import annotations
 import dataclasses as dc
 
 
-def next_number(sequence: dict, year: int) -> dict:
+def next_number(sequence: dict, year: int, expect=None) -> dict:
     """The next invoice number for a business year, and the sequence to keep.
 
     Each business year has its own unbroken run: 2026-0001 up, and then 2027-0001, not
-    2027-0349. The caller stores what it is given back rather than counting for itself,
-    because two people counting is how a sequence grows a gap.
+    2027-0349.
+
+    `expect` is the last number the caller believes was handed out. Two invoices raised
+    in the same minute both read the sequence, both saw 41, and both wrote 42; passing
+    back what was read turns the second one into a refusal it can retry rather than a
+    duplicate nobody notices until the quarter is filed.
     """
-    used = sequence.get(year, 0) + 1
-    return {"number": "%d-%04d" % (year, used), "sequence": {**sequence, year: used}}
+    used = sequence.get(year, 0)
+    if expect is not None and expect != used:
+        return {"ok": False, "reason": "the sequence has moved on", "sequence": sequence}
+    return {"ok": True, "number": "%d-%04d" % (year, used + 1),
+            "sequence": {**sequence, year: used + 1}}
 
 
 @dc.dataclass(frozen=True)
