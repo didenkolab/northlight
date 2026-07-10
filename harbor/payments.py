@@ -30,12 +30,17 @@ def capture(ledger: list, booking_ref: str, amount_cents: int, reference: str,
 
     The confirmation carries an intention, so a guest who presses the button again gets
     back the charge that was already taken rather than a second one.
+
+    The whole ledger is looked at, not the end of it. Checking only the last charge
+    worked in a demonstration and did not work on a Wednesday afternoon: another
+    marina's confirmation landing between a guest's two tries made the retry look new,
+    and three guests were charged twice for one booking each.
     """
     if amount_cents <= 0:
         return {"ok": False, "reason": "nothing to charge", "ledger": ledger}
-    last = ledger[-1] if ledger else None
-    if last is not None and last.booking_ref == booking_ref and last.intent == intent:
-        return {"ok": True, "charge": last, "repeat": True, "ledger": ledger}
+    for taken in ledger:
+        if taken.booking_ref == booking_ref and taken.intent == intent:
+            return {"ok": True, "charge": taken, "repeat": True, "ledger": ledger}
     charge = Charge(reference, booking_ref, amount_cents, intent)
     return {"ok": True, "charge": charge, "repeat": False, "ledger": ledger + [charge]}
 
