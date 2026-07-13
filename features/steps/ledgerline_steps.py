@@ -3,7 +3,7 @@ import datetime as dt
 
 from behave import given, step, then, when
 
-from ledgerline import invoices
+from ledgerline import bankimport, invoices
 
 
 def _names(text):
@@ -75,3 +75,21 @@ def step_invoice_totals(context, net, tax_amount, gross):
     assert got["net_cents"] == net, got
     assert got["tax_cents"] == tax_amount, got
     assert got["gross_cents"] == gross, got
+
+
+@given("an empty ledger")
+def step_empty_ledger(context):
+    context.ledger = {}
+    context.result = None
+
+
+@step("the statement for account {account} is imported")
+def step_import_statement(context, account):
+    lines = [row.as_dict() for row in context.table]
+    context.result = bankimport.import_statement(context.ledger, account, lines)
+    context.ledger = context.result["ledger"]
+
+
+@then("the ledger holds lines dated {days}")
+def step_ledger_dated(context, days):
+    assert [line["date"] for line in context.ledger["lines"]] == _names(days), context.ledger
