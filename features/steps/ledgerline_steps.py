@@ -93,3 +93,8 @@ def step_import_statement(context, account):
 @then("the ledger holds lines dated {days}")
 def step_ledger_dated(context, days):
     assert [line["date"] for line in context.ledger["lines"]] == _names(days), context.ledger
+
+
+@then("the import is recognised as one we already have")
+def step_import_repeat(context):
+    assert context.result["repeat"] is True, context.result

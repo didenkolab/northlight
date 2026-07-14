@@ -31,8 +31,17 @@ def statement_hash(account: str, lines) -> str:
 
 
 def import_statement(ledger: dict, account: str, lines) -> dict:
-    """Put a statement into the ledger."""
+    """Put a statement into the ledger, once.
+
+    Importing the same statement twice is something people do -- the connection dropped,
+    the page was refreshed, the accountant was not sure it had worked -- and until this
+    it produced two of everything and a reconciliation nobody could finish. The digest is
+    of the statement itself, so the second import is recognised rather than merely
+    tolerated.
+    """
     digest = statement_hash(account, lines)
+    if digest in ledger.get("seen", []):
+        return {"ok": True, "imported": 0, "digest": digest, "repeat": True, "ledger": ledger}
     kept = list(ledger.get("lines", [])) + [normalise(line) for line in lines]
     return {"ok": True, "imported": len(lines), "digest": digest, "repeat": False,
             "ledger": {"seen": list(ledger.get("seen", [])) + [digest], "lines": kept}}
