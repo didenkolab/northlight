@@ -77,6 +77,29 @@ def step_invoice_totals(context, net, tax_amount, gross):
     assert got["gross_cents"] == gross, got
 
 
+@given("an invoice {number} for {customer}")
+def step_an_invoice(context, number, customer):
+    context.invoice = invoices.compose(number, customer, _invoice_lines(context.table))
+
+
+@when("{cents:d} cents are credited against it as {number}")
+def step_credit_against(context, cents, number):
+    context.result = invoices.credit_note(context.invoice, cents, "cancelled", number)
+
+
+@then("the credit note is made out against {number}")
+def step_credit_note_against(context, number):
+    assert context.result["ok"], context.result
+    assert context.result["note"]["against"] == number, context.result
+
+
+@step("crediting {cents:d} cents is refused because {reason}")
+def step_credit_refused(context, cents, reason):
+    refused = invoices.credit_note(context.invoice, cents, "cancelled", "2026-C999")
+    assert refused["ok"] is False, refused
+    assert refused["reason"] == reason, refused
+
+
 @given("an empty ledger")
 def step_empty_ledger(context):
     context.ledger = {}

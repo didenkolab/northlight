@@ -68,3 +68,18 @@ def totals(invoice: dict) -> dict:
         "tax_cents": sum(line["tax_cents"] for line in invoice["lines"]),
         "gross_cents": sum(line["gross_cents"] for line in invoice["lines"]),
     }
+
+
+def credit_note(invoice: dict, amount_cents: int, reason: str, number: str) -> dict:
+    """A refund is not a negative invoice; it is a credit note against the one it undoes.
+
+    An invoice that has been issued stays issued, so the money going back is its own
+    document with its own number and a line pointing at what it credits. More than the
+    invoice was for is refused: there is nothing there to credit.
+    """
+    if amount_cents <= 0:
+        return {"ok": False, "reason": "a credit note is for a positive amount"}
+    if amount_cents > totals(invoice)["gross_cents"]:
+        return {"ok": False, "reason": "more than the invoice it credits"}
+    return {"ok": True, "note": {"number": number, "against": invoice["number"],
+                                 "amount_cents": amount_cents, "reason": reason}}

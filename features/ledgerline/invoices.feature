@@ -36,3 +36,12 @@ Feature: Invoice numbers and the lines under them
     Given 1 invoice is numbered for 2026
     When two invoices are numbered from one reading of the sequence for 2026
     Then the second one is refused because the sequence has moved on
+
+  @LEDGER-INV-005
+  Scenario: A refund is a credit note against the invoice it undoes
+    Given an invoice 2026-0007 for Bergstrom Accounting
+      | description | quantity | unit_cents | tax_percent |
+      | Bookkeeping | 10       | 8000       | 25          |
+    When 20000 cents are credited against it as 2026-C002
+    Then the credit note is made out against 2026-0007
+    And crediting 200000 cents is refused because more than the invoice it credits
