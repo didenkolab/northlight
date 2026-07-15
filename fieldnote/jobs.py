@@ -1,0 +1,37 @@
+"""What a crew is going to today, and in what order.
+
+A board is a list of Job. Everything here takes one and gives back another; the
+dispatcher's screen is somewhere else's problem.
+"""
+from __future__ import annotations
+
+import dataclasses as dc
+import datetime as dt
+
+
+@dc.dataclass(frozen=True)
+class Job:
+    """One visit: whose it is, which day, when it starts and how long it is meant to take."""
+
+    id: str
+    crew: str
+    day: dt.date
+    start: dt.time
+    minutes: int
+    address: str
+    status: str = "planned"
+
+
+def ends(job: "Job") -> dt.time:
+    """When the crew is meant to be back in the van."""
+    return (dt.datetime.combine(job.day, job.start) + dt.timedelta(minutes=job.minutes)).time()
+
+
+def day_list(board: list, crew: str, day: dt.date) -> list:
+    """One crew's day, in the order it is meant to happen.
+
+    Sorted by the clock and then by job id, so two jobs planned for the same minute come
+    out in the same order every time the crew opens the phone.
+    """
+    theirs = [job for job in board if job.crew == crew and job.day == day]
+    return sorted(theirs, key=lambda job: (job.start, job.id))
