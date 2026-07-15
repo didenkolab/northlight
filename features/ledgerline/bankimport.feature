@@ -23,3 +23,14 @@ Feature: Importing a bank statement
       | 2026-07-01 | 45000 | 2026-0007 | Bergstrom    |
     Then the import is recognised as one we already have
     And the ledger holds lines dated 2026-07-01
+
+  @LEDGER-BNK-003
+  Scenario: A statement that arrives as a file
+    When this file is read as a statement
+      """
+      date,amount,message
+      2026-07-01,450.00,2026-0007
+      2026-07-02,120.00,2026-0008
+      """
+    Then the file gives lines dated 2026-07-01 and 2026-07-02
+    And the first line of the file is 45000 cents

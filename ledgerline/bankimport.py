@@ -45,3 +45,22 @@ def import_statement(ledger: dict, account: str, lines) -> dict:
     kept = list(ledger.get("lines", [])) + [normalise(line) for line in lines]
     return {"ok": True, "imported": len(lines), "digest": digest, "repeat": False,
             "ledger": {"seen": list(ledger.get("seen", [])) + [digest], "lines": kept}}
+
+
+def lines_from_csv(text: str, columns: dict) -> list:
+    """A statement that arrives as a file rather than through a door.
+
+    `columns` says which of the file's own headings holds the date, the amount and the
+    reference, because no two of them agree and the third bank changes its mind about
+    the order every spring.
+    """
+    rows = csv.DictReader(io.StringIO(text))
+    lines = []
+    for row in rows:
+        amount = row[columns["cents"]].strip().replace(" ", "").replace(",", ".")
+        lines.append({"date": row[columns["date"]].strip(),
+                      "cents": int(round(float(amount) * 100)),
+                      "reference": row.get(columns.get("reference", ""), "") or "",
+                      "counterparty": row.get(columns.get("counterparty", ""), "") or "",
+                      "direction": row.get(columns.get("direction", ""), "") or ""})
+    return lines

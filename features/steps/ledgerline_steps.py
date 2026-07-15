@@ -121,3 +121,21 @@ def step_ledger_dated(context, days):
 @then("the import is recognised as one we already have")
 def step_import_repeat(context):
     assert context.result["repeat"] is True, context.result
+
+
+FILE_COLUMNS = {"date": "date", "cents": "amount", "reference": "message"}
+
+
+@when("this file is read as a statement")
+def step_read_file(context):
+    context.lines = bankimport.lines_from_csv(context.text, FILE_COLUMNS)
+
+
+@then("the file gives lines dated {days}")
+def step_file_dated(context, days):
+    assert [line["date"] for line in context.lines] == _names(days), context.lines
+
+
+@then("the first line of the file is {cents:d} cents")
+def step_file_first_line(context, cents):
+    assert context.lines[0]["cents"] == cents, context.lines[0]
