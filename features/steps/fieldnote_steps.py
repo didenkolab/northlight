@@ -44,3 +44,27 @@ def step_read_crew_day(context, crew, day):
 @then("the day is {ids}")
 def step_day_is(context, ids):
     assert [job.id for job in context.day] == _names(ids), context.day
+
+
+@when("{job_id} is put on the {crew} crew for {day} at {start} for {minutes:d} minutes")
+def step_put_on_crew(context, job_id, crew, day, start, minutes):
+    context.result = jobs.assign(context.board,
+                                 jobs.Job(job_id, crew, _day(day), _time(start), minutes,
+                                          "Somewhere 1"))
+    context.board = context.result["board"]
+
+
+@then("the job is taken")
+def step_job_taken(context):
+    assert context.result["ok"] is True, context.result
+
+
+@then("the job is refused because {reason}")
+def step_job_refused(context, reason):
+    assert context.result["ok"] is False, context.result
+    assert context.result["reason"] == reason, context.result
+
+
+@then("the job in the way is {job_id}")
+def step_job_in_the_way(context, job_id):
+    assert context.result["clash"] == job_id, context.result

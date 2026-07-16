@@ -14,3 +14,12 @@ Feature: A crew's day
       | J-2 | north | 2026-07-16 | 11:00 | 45      | Fjellveien 7 |
     When the north crew's day for 2026-07-16 is read
     Then the day is J-1, J-2 and J-3
+
+  @FIELD-JOB-002
+  Scenario: A crew cannot be in two places at two o'clock
+    Given these jobs are on the board
+      | id  | crew  | day        | start | minutes | address    |
+      | J-1 | north | 2026-07-16 | 14:00 | 60      | Storgata 4 |
+    When J-2 is put on the north crew for 2026-07-16 at 14:30 for 30 minutes
+    Then the job is refused because the crew is already out
+    And the job in the way is J-1

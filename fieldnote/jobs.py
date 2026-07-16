@@ -35,3 +35,27 @@ def day_list(board: list, crew: str, day: dt.date) -> list:
     """
     theirs = [job for job in board if job.crew == crew and job.day == day]
     return sorted(theirs, key=lambda job: (job.start, job.id))
+
+
+def clashes(board: list, job: "Job") -> list:
+    """The jobs already on this crew's day that want the same minutes.
+
+    A job that finishes exactly as the next one starts is not a clash; it is a tight day.
+    """
+    same_day = [other for other in board
+                if other.crew == job.crew and other.day == job.day and other.id != job.id]
+    return [other for other in same_day
+            if other.start < ends(job) and job.start < ends(other)]
+
+
+def assign(board: list, job: "Job") -> dict:
+    """Put a job on a crew. Two o'clock belongs to one job, not two.
+
+    The dispatcher gets the job that is in the way rather than a refusal, because their
+    next question is always which one.
+    """
+    clash = clashes(board, job)
+    if clash:
+        return {"ok": False, "reason": "the crew is already out", "clash": clash[0].id,
+                "board": board}
+    return {"ok": True, "job": job, "board": board + [job]}
