@@ -34,3 +34,11 @@ Feature: Importing a bank statement
       """
     Then the file gives lines dated 2026-07-01 and 2026-07-02
     And the first line of the file is 45000 cents
+
+  @LEDGER-BNK-004
+  Scenario: Money leaving the account is a negative line
+    When the statement for account NO-1 is imported
+      | date       | cents | direction | reference | counterparty |
+      | 2026-07-01 | 45000 | credit    | 2026-0007 | Bergstrom    |
+      | 2026-07-02 | 12000 | debit     | refund    | Havn AS      |
+    Then the ledger's amounts are 45000 and -12000

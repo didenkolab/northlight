@@ -14,9 +14,25 @@ import json
 
 def normalise(line: dict) -> dict:
     """One statement line, in the shape the ledger keeps them in."""
-    return {"date": line["date"], "cents": int(line["cents"]),
+    return {"date": line["date"], "cents": signed_cents(line),
             "reference": (line.get("reference") or "").strip(),
             "counterparty": (line.get("counterparty") or "").strip()}
+
+
+def signed_cents(line: dict) -> int:
+    """Money leaving the account is negative, whichever way the bank writes it.
+
+    Two of our three put the direction in a column of its own and leave the amount
+    positive, so a refund sent to a customer read as a payment received and the day's
+    takings came out at twice what the practice had actually taken.
+    """
+    cents = int(line["cents"])
+    direction = (line.get("direction") or "").strip().lower()
+    if direction in ("debit", "out", "d"):
+        return -abs(cents)
+    if direction in ("credit", "in", "c"):
+        return abs(cents)
+    return cents
 
 
 def statement_hash(account: str, lines) -> str:

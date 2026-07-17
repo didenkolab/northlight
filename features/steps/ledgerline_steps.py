@@ -139,3 +139,9 @@ def step_file_dated(context, days):
 @then("the first line of the file is {cents:d} cents")
 def step_file_first_line(context, cents):
     assert context.lines[0]["cents"] == cents, context.lines[0]
+
+
+@then("the ledger's amounts are {amounts}")
+def step_ledger_amounts(context, amounts):
+    want = [int(part) for part in _names(amounts)]
+    assert [line["cents"] for line in context.ledger["lines"]] == want, context.ledger
