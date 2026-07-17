@@ -3,7 +3,7 @@ import datetime as dt
 
 from behave import given, step, then, when
 
-from fieldnote import jobs
+from fieldnote import jobs, routes
 
 
 def _names(text):
@@ -68,3 +68,19 @@ def step_job_refused(context, reason):
 @then("the job in the way is {job_id}")
 def step_job_in_the_way(context, job_id):
     assert context.result["clash"] == job_id, context.result
+
+
+@given("the roads we know")
+def step_roads_we_know(context):
+    context.roads = {(row["from"], row["to"]): int(row["minutes"]) for row in context.table}
+    context.places = {}
+
+
+@when("the stops {stops} are ordered from {depot}")
+def step_order_stops(context, stops, depot):
+    context.order = routes.order_stops(depot, _names(stops), context.roads)
+
+
+@then("the order is {stops}")
+def step_order_is(context, stops):
+    assert context.order == _names(stops), context.order
