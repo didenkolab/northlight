@@ -18,17 +18,34 @@ def travel_minutes(roads: dict, here: str, there: str):
     return None
 
 
-def order_stops(depot: str, stops, roads: dict) -> list:
+def straight_minutes(places: dict, here: str, there: str) -> int:
+    """A number for a road we have no time for.
+
+    The straight line, and then a third again, because no road is the line -- least of
+    all round a fjord, where the line is water. It is a guess and the plan is allowed to
+    say so; what it must not do is call it nothing.
+    """
+    (here_x, here_y), (there_x, there_y) = places[here], places[there]
+    line = ((here_x - there_x) ** 2 + (here_y - there_y) ** 2) ** 0.5
+    return int(round(line * 1.3))
+
+
+def leg_minutes(roads: dict, places: dict, here: str, there: str) -> int:
+    """The road if we know it, the guess if we do not."""
+    known = travel_minutes(roads, here, there)
+    return known if known is not None else straight_minutes(places, here, there)
+
+
+def order_stops(depot: str, stops, roads: dict, places: dict) -> list:
     """Nearest first, from the depot and then from wherever the crew has got to.
 
     Not the shortest possible day -- that is a harder problem than the difference is
     worth on eleven stops -- but a day that never sends a van back past where it has
     already been.
     """
-    remaining, order, here = list(stops), [], depot
+    remaining, order, here = sorted(stops), [], depot
     while remaining:
-        remaining.sort()
-        nearest = min(remaining, key=lambda stop: (travel_minutes(roads, here, stop) or 999, stop))
+        nearest = min(remaining, key=lambda stop: (leg_minutes(roads, places, here, stop), stop))
         remaining.remove(nearest)
         order.append(nearest)
         here = nearest

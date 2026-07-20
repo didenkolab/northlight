@@ -78,9 +78,24 @@ def step_roads_we_know(context):
 
 @when("the stops {stops} are ordered from {depot}")
 def step_order_stops(context, stops, depot):
-    context.order = routes.order_stops(depot, _names(stops), context.roads)
+    context.order = routes.order_stops(depot, _names(stops), context.roads, context.places)
 
 
 @then("the order is {stops}")
 def step_order_is(context, stops):
     assert context.order == _names(stops), context.order
+
+
+@given("where the stops are")
+def step_where_stops_are(context):
+    context.places = {row["stop"]: (float(row["x"]), float(row["y"])) for row in context.table}
+
+
+@when("the leg from {here} to {there} is worked out")
+def step_leg_worked_out(context, here, there):
+    context.leg = routes.leg_minutes(context.roads, context.places, here, there)
+
+
+@then("the leg is {minutes:d} minutes")
+def step_leg_is(context, minutes):
+    assert context.leg == minutes, context.leg

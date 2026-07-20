@@ -16,3 +16,15 @@ Feature: Ordering a crew's day
   Scenario: The nearest stop first
     When the stops north, west and east are ordered from depot
     Then the order is north, west and east
+
+  @FIELD-RTE-002
+  Scenario: A road we have never driven is guessed from the distance
+    Given where the stops are
+      | stop  | x  | y  |
+      | depot | 0  | 0  |
+      | north | 0  | 20 |
+      | west  | 30 | 0  |
+      | east  | 40 | 40 |
+      | isle  | 0  | 60 |
+    When the leg from north to isle is worked out
+    Then the leg is 52 minutes
