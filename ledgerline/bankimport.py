@@ -80,3 +80,29 @@ def lines_from_csv(text: str, columns: dict) -> list:
                       "counterparty": row.get(columns.get("counterparty", ""), "") or "",
                       "direction": row.get(columns.get("direction", ""), "") or ""})
     return lines
+
+
+def match(lines, invoices) -> dict:
+    """Pair the bank's lines with the invoices they pay.
+
+    The amount has to be right, and then the reference the payer typed has to name the
+    invoice. Anything that needs more cleverness than that is left unmatched on purpose:
+    a wrong pairing costs a person an hour to find and a right one saves them a minute.
+    """
+    left = list(invoices)
+    matched, unmatched = [], []
+    for index, line in enumerate(lines):
+        found = None
+        for invoice in left:
+            if invoice["cents"] != line["cents"]:
+                continue
+            if invoice["number"] not in (line.get("reference") or ""):
+                continue
+            found = invoice
+            break
+        if found is None:
+            unmatched.append(index)
+        else:
+            left.remove(found)
+            matched.append({"line": index, "invoice": found["number"]})
+    return {"matched": matched, "unmatched": unmatched}

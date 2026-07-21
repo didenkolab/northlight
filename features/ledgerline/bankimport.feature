@@ -42,3 +42,24 @@ Feature: Importing a bank statement
       | 2026-07-01 | 45000 | credit    | 2026-0007 | Bergstrom    |
       | 2026-07-02 | 12000 | debit     | refund    | Havn AS      |
     Then the ledger's amounts are 45000 and -12000
+
+  @LEDGER-BNK-005
+  Scenario: A bank line is matched to the invoice it pays
+    Given the ledger is owed
+      | number    | cents |
+      | 2026-0007 | 45000 |
+      | 2026-0008 | 12000 |
+    When these lines are matched
+      | date       | cents | reference           |
+      | 2026-07-01 | 45000 | payment 2026-0007   |
+      | 2026-07-02 | 12000 | 2026-0008 thank you |
+    Then the lines are matched to 2026-0007 and 2026-0008
+
+  Scenario: A line nobody can match is left for a person
+    Given the ledger is owed
+      | number    | cents |
+      | 2026-0007 | 45000 |
+    When these lines are matched
+      | date       | cents | reference |
+      | 2026-07-01 | 45000 | inv 7     |
+    Then line 0 is left unmatched

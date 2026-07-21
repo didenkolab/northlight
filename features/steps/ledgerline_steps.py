@@ -145,3 +145,27 @@ def step_file_first_line(context, cents):
 def step_ledger_amounts(context, amounts):
     want = [int(part) for part in _names(amounts)]
     assert [line["cents"] for line in context.ledger["lines"]] == want, context.ledger
+
+
+@given("the ledger is owed")
+def step_ledger_owed(context):
+    context.invoices = [{"number": row["number"], "cents": int(row["cents"])}
+                        for row in context.table]
+
+
+@when("these lines are matched")
+def step_lines_matched(context):
+    lines = [{"date": row["date"], "cents": int(row["cents"]), "reference": row["reference"]}
+             for row in context.table]
+    context.result = bankimport.match(lines, context.invoices)
+
+
+@then("the lines are matched to {numbers}")
+def step_matched_to(context, numbers):
+    got = [pair["invoice"] for pair in context.result["matched"]]
+    assert got == _names(numbers), context.result
+
+
+@then("line {index:d} is left unmatched")
+def step_line_unmatched(context, index):
+    assert index in context.result["unmatched"], context.result
