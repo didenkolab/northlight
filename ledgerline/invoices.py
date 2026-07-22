@@ -83,3 +83,19 @@ def credit_note(invoice: dict, amount_cents: int, reason: str, number: str) -> d
         return {"ok": False, "reason": "more than the invoice it credits"}
     return {"ok": True, "note": {"number": number, "against": invoice["number"],
                                  "amount_cents": amount_cents, "reason": reason}}
+
+
+def reminders_due(due_day, today, sent) -> dict:
+    """Whether to chase a late invoice, and what to say.
+
+    Twice: a week over, and a month over. After that it stops on its own and a person
+    decides what to do, because a machine that chases for ever is how a practice loses a
+    client it could have kept by ringing them up.
+    """
+    if len(sent) >= 2:
+        return {"send": False, "reason": "chased twice already"}
+    overdue = (today - due_day).days
+    for stage, after in ((1, 7), (2, 30)):
+        if overdue >= after and len(sent) < stage:
+            return {"send": True, "stage": stage, "overdue_days": overdue}
+    return {"send": False, "reason": "not late enough yet"}

@@ -100,6 +100,33 @@ def step_credit_refused(context, cents, reason):
     assert refused["reason"] == reason, refused
 
 
+@given("an invoice fell due on {day}")
+def step_fell_due(context, day):
+    context.due = _day(day)
+
+
+@step("it is {day} and nothing has been chased yet")
+def step_nothing_chased(context, day):
+    context.result = invoices.reminders_due(context.due, _day(day), [])
+
+
+@step("it is {day} and {count:d} reminder has been sent")
+@step("it is {day} and {count:d} reminders have been sent")
+def step_some_chased(context, day, count):
+    context.result = invoices.reminders_due(context.due, _day(day), ["sent"] * count)
+
+
+@then("a reminder goes out")
+def step_reminder_goes_out(context):
+    assert context.result["send"] is True, context.result
+
+
+@then("no reminder goes out because {reason}")
+def step_no_reminder(context, reason):
+    assert context.result["send"] is False, context.result
+    assert context.result["reason"] == reason, context.result
+
+
 @given("an empty ledger")
 def step_empty_ledger(context):
     context.ledger = {}

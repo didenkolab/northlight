@@ -45,3 +45,12 @@ Feature: Invoice numbers and the lines under them
     When 20000 cents are credited against it as 2026-C002
     Then the credit note is made out against 2026-0007
     And crediting 200000 cents is refused because more than the invoice it credits
+
+  Scenario: A late invoice is chased twice and then left alone
+    Given an invoice fell due on 2026-07-01
+    When it is 2026-07-09 and nothing has been chased yet
+    Then a reminder goes out
+    When it is 2026-08-05 and 1 reminder has been sent
+    Then a reminder goes out
+    When it is 2026-09-01 and 2 reminders have been sent
+    Then no reminder goes out because chased twice already
