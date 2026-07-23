@@ -99,3 +99,13 @@ def step_leg_worked_out(context, here, there):
 @then("the leg is {minutes:d} minutes")
 def step_leg_is(context, minutes):
     assert context.leg == minutes, context.leg
+
+
+@when("the day through {stops} is planned from {depot}")
+def step_plan_day(context, stops, depot):
+    context.plan = routes.plan_day(depot, _names(stops), context.roads, context.places)
+
+
+@then("the plan is {stops}")
+def step_plan_is(context, stops):
+    assert context.plan == _names(stops), context.plan

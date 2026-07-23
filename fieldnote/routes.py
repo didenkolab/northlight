@@ -50,3 +50,12 @@ def order_stops(depot: str, stops, roads: dict, places: dict) -> list:
         order.append(nearest)
         here = nearest
     return order
+
+
+def plan_day(depot: str, stops, roads: dict, places: dict) -> list:
+    """The whole day, depot to depot.
+
+    The van starts at the depot and has to get back to it, and a plan that stops at the
+    last customer hides an hour of driving from the crew who has to do it.
+    """
+    return [depot] + order_stops(depot, stops, roads, places) + [depot]

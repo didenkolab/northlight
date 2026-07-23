@@ -28,3 +28,14 @@ Feature: Ordering a crew's day
       | isle  | 0  | 60 |
     When the leg from north to isle is worked out
     Then the leg is 52 minutes
+
+  @FIELD-RTE-003
+  Scenario: The depot is both ends of the day
+    Given where the stops are
+      | stop  | x  | y  |
+      | depot | 0  | 0  |
+      | north | 0  | 20 |
+      | west  | 30 | 0  |
+      | east  | 40 | 40 |
+    When the day through north, west and east is planned from depot
+    Then the plan is depot, north, west, east and depot
