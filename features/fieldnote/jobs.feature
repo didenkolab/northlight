@@ -23,3 +23,12 @@ Feature: A crew's day
     When J-2 is put on the north crew for 2026-07-16 at 14:30 for 30 minutes
     Then the job is refused because the crew is already out
     And the job in the way is J-1
+
+  @FIELD-JOB-003
+  Scenario: A job is handed to another crew from the board
+    Given these jobs are on the board
+      | id  | crew  | day        | start | minutes | address    |
+      | J-1 | north | 2026-07-16 | 14:00 | 60      | Storgata 4 |
+    When J-1 is handed to the south crew
+    Then the job is taken
+    And the south crew's day for 2026-07-16 is J-1

@@ -59,3 +59,17 @@ def assign(board: list, job: "Job") -> dict:
         return {"ok": False, "reason": "the crew is already out", "clash": clash[0].id,
                 "board": board}
     return {"ok": True, "job": job, "board": board + [job]}
+
+
+def move_crew(board: list, job_id: str, crew: str) -> dict:
+    """Hand a job to another crew, if their day has room for it."""
+    job = next((j for j in board if j.id == job_id), None)
+    if job is None:
+        return {"ok": False, "reason": "no such job", "board": board}
+    moved = dc.replace(job, crew=crew)
+    rest = [j for j in board if j.id != job_id]
+    clash = clashes(rest, moved)
+    if clash:
+        return {"ok": False, "reason": "the crew is already out", "clash": clash[0].id,
+                "board": board}
+    return {"ok": True, "job": moved, "board": rest + [moved]}

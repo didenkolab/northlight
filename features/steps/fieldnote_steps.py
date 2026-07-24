@@ -70,6 +70,18 @@ def step_job_in_the_way(context, job_id):
     assert context.result["clash"] == job_id, context.result
 
 
+@when("{job_id} is handed to the {crew} crew")
+def step_handed_to_crew(context, job_id, crew):
+    context.result = jobs.move_crew(context.board, job_id, crew)
+    context.board = context.result["board"]
+
+
+@then("the {crew} crew's day for {day} is {ids}")
+def step_crew_day_is(context, crew, day, ids):
+    got = jobs.day_list(context.board, crew, _day(day))
+    assert [job.id for job in got] == _names(ids), got
+
+
 @given("the roads we know")
 def step_roads_we_know(context):
     context.roads = {(row["from"], row["to"]): int(row["minutes"]) for row in context.table}
