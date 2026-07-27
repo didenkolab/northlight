@@ -3,7 +3,7 @@ import datetime as dt
 
 from behave import given, step, then, when
 
-from fieldnote import jobs, routes
+from fieldnote import jobs, routes, sync
 
 
 def _names(text):
@@ -121,3 +121,36 @@ def step_plan_day(context, stops, depot):
 @then("the plan is {stops}")
 def step_plan_is(context, stops):
     assert context.plan == _names(stops), context.plan
+
+
+@given("nothing on the phone and nothing on the board")
+def step_nothing_anywhere(context):
+    context.phone = {"jobs": [], "photos": []}
+    context.server = {"jobs": [], "photos": []}
+    context.edits = []
+
+
+@given("the board has these jobs")
+def step_board_jobs(context):
+    context.server = {**context.server, "jobs": [row.as_dict() for row in context.table]}
+
+
+@given("the phone has these jobs")
+def step_phone_jobs(context):
+    context.phone = {**context.phone, "jobs": [row.as_dict() for row in context.table]}
+
+
+@when("the phone and the board are merged")
+def step_merged(context):
+    context.merged = sync.merge(context.phone, context.server)
+
+
+@then("{job_id} comes back as {status}")
+def step_comes_back_as(context, job_id, status):
+    job = next(j for j in context.merged["jobs"] if j["id"] == job_id)
+    assert job["status"] == status, job
+
+
+@then("the merged day is {ids}")
+def step_merged_day(context, ids):
+    assert [job["id"] for job in context.merged["jobs"]] == _names(ids), context.merged
