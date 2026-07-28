@@ -7,7 +7,7 @@ import datetime as dt
 
 from behave import given, step, then, when
 
-from harbor import booking, invoice, payments
+from harbor import booking, checkin, invoice, payments
 
 
 def _names(text):
@@ -33,6 +33,9 @@ def step_marina_has_berths(context, names):
     context.rates = []
     context.ledger = []
     context.tokens = {}
+    context.queue = []
+    context.arrived = []
+    context.codes = {}
     context.result = None
 
 
@@ -204,3 +207,31 @@ def step_comes_back(context, token):
 def step_put_back_on(context, ref):
     assert context.result["ok"], context.result
     assert context.result["booking_ref"] == ref, context.result
+
+
+@given("the phone has no signal")
+def step_no_signal(context):
+    context.queue = []
+    context.arrived = []
+
+
+@step("{who} checks {ref} in at {clock}")
+def step_checks_in(context, who, ref, clock):
+    context.queue = checkin.queue(context.queue, checkin.CheckIn(ref, _clock(clock), who))
+
+
+@then("the phone is holding {refs}")
+def step_phone_holding(context, refs):
+    assert [entry.booking_ref for entry in context.queue] == _names(refs), context.queue
+
+
+@step("the phone finds a signal")
+def step_finds_signal(context):
+    context.result = checkin.flush(context.queue, context.arrived)
+    context.arrived = context.result["arrived"]
+    context.queue = context.result["pending"]
+
+
+@then("the office has {refs} as arrived")
+def step_office_has(context, refs):
+    assert context.arrived == _names(refs), context.arrived
