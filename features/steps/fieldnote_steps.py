@@ -154,3 +154,15 @@ def step_comes_back_as(context, job_id, status):
 @then("the merged day is {ids}")
 def step_merged_day(context, ids):
     assert [job["id"] for job in context.merged["jobs"]] == _names(ids), context.merged
+
+
+@given("the phone queued these edits")
+def step_queued_edits(context):
+    for row in context.table:
+        context.edits = sync.queue_edit(context.edits, row.as_dict())
+
+
+@when("the queued edits are replayed onto the board")
+def step_replay_edits(context):
+    context.merged = {"jobs": sync.apply_edits(context.server["jobs"], context.edits),
+                      "conflicts": []}

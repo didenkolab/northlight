@@ -27,3 +27,14 @@ Feature: Putting a phone back together with the board
       | J-1 | north | done   |
     When the phone and the board are merged
     Then the merged day is J-1 and J-2
+
+  Scenario: The edits made while the phone was dark are replayed in the order they were made
+    Given the board has these jobs
+      | id  | crew  | status  |
+      | J-1 | north | planned |
+    And the phone queued these edits
+      | id  | field  | value      |
+      | J-1 | status | on the way |
+      | J-1 | status | done       |
+    When the queued edits are replayed onto the board
+    Then J-1 comes back as done
