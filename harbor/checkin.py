@@ -25,10 +25,17 @@ def queue(pending: list, entry: "CheckIn") -> list:
 
 
 def flush(pending: list, arrived) -> dict:
-    """Send the queue. A guest the office already has is not checked in twice."""
+    """Send the queue, oldest first. A guest the office already has is not checked in
+    twice.
+
+    The order matters because the office reads the arrivals as a list of what happened,
+    and a phone that has been dark since breakfast has a morning's worth of them. Sending
+    them in the order the phone happened to hold them put half past nine after half past
+    four.
+    """
     seen = list(arrived)
     applied = []
-    for entry in pending:
+    for entry in sorted(pending, key=lambda e: (e.at, e.booking_ref)):
         if entry.booking_ref in seen:
             continue
         seen.append(entry.booking_ref)
