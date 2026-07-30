@@ -54,3 +54,13 @@ Feature: Invoice numbers and the lines under them
     Then a reminder goes out
     When it is 2026-09-01 and 2 reminders have been sent
     Then no reminder goes out because chased twice already
+
+  Scenario: An invoice that bounced is not an invoice that arrived
+    Given these things happened to our messages
+      | message_id | state     |
+      | m-1        | delivered |
+      | m-2        | bounced   |
+    When we ask what became of m-2
+    Then what became of it is bounced
+    When we ask what became of m-3
+    Then what became of it is unknown

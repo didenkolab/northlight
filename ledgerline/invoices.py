@@ -99,3 +99,17 @@ def reminders_due(due_day, today, sent) -> dict:
         if overdue >= after and len(sent) < stage:
             return {"send": True, "stage": stage, "overdue_days": overdue}
     return {"send": False, "reason": "not late enough yet"}
+
+
+def delivery(message_id: str, events) -> dict:
+    """What became of an invoice we sent.
+
+    The practice's question is not whether we pressed send; it is whether the client can
+    say they never got it. An address that bounced is worth knowing about the same
+    morning, and silence is reported as silence rather than as success.
+    """
+    mine = [e for e in events if e.get("message_id") == message_id]
+    for state in ("bounced", "delivered"):
+        if any(e.get("state") == state for e in mine):
+            return {"state": state, "known": True}
+    return {"state": "unknown", "known": False}

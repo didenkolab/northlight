@@ -127,6 +127,21 @@ def step_no_reminder(context, reason):
     assert context.result["reason"] == reason, context.result
 
 
+@given("these things happened to our messages")
+def step_message_events(context):
+    context.events = [row.as_dict() for row in context.table]
+
+
+@when("we ask what became of {message_id}")
+def step_ask_what_became(context, message_id):
+    context.result = invoices.delivery(message_id, context.events)
+
+
+@then("what became of it is {state}")
+def step_what_became(context, state):
+    assert context.result["state"] == state, context.result
+
+
 @given("an empty ledger")
 def step_empty_ledger(context):
     context.ledger = {}
