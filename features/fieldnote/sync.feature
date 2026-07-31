@@ -38,3 +38,14 @@ Feature: Putting a phone back together with the board
       | J-1 | status | done       |
     When the queued edits are replayed onto the board
     Then J-1 comes back as done
+
+  @FIELD-SYN-003
+  Scenario: What the two sides disagreed about is written down
+    Given the board has these jobs
+      | id  | crew  | status  |
+      | J-1 | north | planned |
+    And the phone has these jobs
+      | id  | crew  | status |
+      | J-1 | north | done   |
+    When the phone and the board are merged
+    Then the merge reports J-1 as done on the phone and planned on the board

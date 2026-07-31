@@ -11,11 +11,22 @@ def merge(phone: dict, server: dict) -> dict:
 
     A job comes from the board, so the board's version of one it knows about is the one
     that is kept, and anything the phone made while it was dark is added to it.
+
+    Where the two disagree about a job they both know, the disagreement is reported
+    rather than swallowed: we cannot yet say which side should win, but we can stop
+    pretending there was nothing to decide.
     """
     jobs = {job["id"]: dict(job) for job in server.get("jobs", [])}
+    conflicts = []
     for job in phone.get("jobs", []):
-        jobs.setdefault(job["id"], dict(job))
-    return {"jobs": [jobs[key] for key in sorted(jobs)], "conflicts": []}
+        theirs = jobs.get(job["id"])
+        if theirs is None:
+            jobs[job["id"]] = dict(job)
+            continue
+        if theirs.get("status") != job.get("status"):
+            conflicts.append({"id": job["id"], "phone": job.get("status"),
+                              "server": theirs.get("status")})
+    return {"jobs": [jobs[key] for key in sorted(jobs)], "conflicts": conflicts}
 
 
 def queue_edit(pending: list, edit: dict) -> list:

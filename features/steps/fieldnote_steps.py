@@ -166,3 +166,11 @@ def step_queued_edits(context):
 def step_replay_edits(context):
     context.merged = {"jobs": sync.apply_edits(context.server["jobs"], context.edits),
                       "conflicts": []}
+
+
+@then("the merge reports {job_id} as {phone_status} on the phone and {board_status} on the board")
+def step_merge_reports(context, job_id, phone_status, board_status):
+    found = [row for row in context.merged["conflicts"] if row["id"] == job_id]
+    assert found, context.merged
+    assert found[0]["phone"] == phone_status, found
+    assert found[0]["server"] == board_status, found
