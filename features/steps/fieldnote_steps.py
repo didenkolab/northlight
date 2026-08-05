@@ -174,3 +174,9 @@ def step_merge_reports(context, job_id, phone_status, board_status):
     assert found, context.merged
     assert found[0]["phone"] == phone_status, found
     assert found[0]["server"] == board_status, found
+
+
+@then("{job_id} belongs to the {crew} crew")
+def step_belongs_to_crew(context, job_id, crew):
+    job = next(j for j in context.merged["jobs"] if j["id"] == job_id)
+    assert job["crew"] == crew, job

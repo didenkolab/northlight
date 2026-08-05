@@ -9,12 +9,13 @@ from __future__ import annotations
 def merge(phone: dict, server: dict) -> dict:
     """What the phone and the board together say the day was.
 
-    A job comes from the board, so the board's version of one it knows about is the one
-    that is kept, and anything the phone made while it was dark is added to it.
+    The fields split rather than one side winning the whole job. Letting the server win
+    outright lost a crew their whole afternoon: eleven jobs they had finished on the
+    mountain road came back as still planned, because the board had never heard
+    otherwise and the board was the record of truth.
 
-    Where the two disagree about a job they both know, the disagreement is reported
-    rather than swallowed: we cannot yet say which side should win, but we can stop
-    pretending there was nothing to decide.
+    Where the two disagree the disagreement is still reported, so the dispatcher can see
+    what was decided for them.
     """
     jobs = {job["id"]: dict(job) for job in server.get("jobs", [])}
     conflicts = []
@@ -23,10 +24,25 @@ def merge(phone: dict, server: dict) -> dict:
         if theirs is None:
             jobs[job["id"]] = dict(job)
             continue
+        merged = dict(theirs)
+        for field in PHONE_WINS:
+            if field in job:
+                merged[field] = job[field]
+        for field in SERVER_WINS:
+            if field in theirs:
+                merged[field] = theirs[field]
         if theirs.get("status") != job.get("status"):
             conflicts.append({"id": job["id"], "phone": job.get("status"),
                               "server": theirs.get("status")})
+        jobs[job["id"]] = merged
     return {"jobs": [jobs[key] for key in sorted(jobs)], "conflicts": conflicts}
+
+
+# What each side is the authority on. The crew standing in somebody's garden knows
+# whether the work is done; the dispatcher at a desk knows whose job it is and which day
+# it is on. Nothing is on both lists, and anything on neither keeps the server's value.
+PHONE_WINS = ("status", "note", "finished_at", "signature")
+SERVER_WINS = ("crew", "day", "start", "address", "customer")
 
 
 def queue_edit(pending: list, edit: dict) -> list:

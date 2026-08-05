@@ -49,3 +49,15 @@ Feature: Putting a phone back together with the board
       | J-1 | north | done   |
     When the phone and the board are merged
     Then the merge reports J-1 as done on the phone and planned on the board
+
+  @FIELD-SYN-004
+  Scenario: The dispatcher's crew and day win over the phone's
+    Given the board has these jobs
+      | id  | crew  | status  |
+      | J-1 | south | planned |
+    And the phone has these jobs
+      | id  | crew  | status |
+      | J-1 | north | done   |
+    When the phone and the board are merged
+    Then J-1 comes back as done
+    And J-1 belongs to the south crew
