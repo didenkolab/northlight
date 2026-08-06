@@ -148,6 +148,11 @@ def step_free_between(context, start, end, names):
     assert free == _names(names), free
 
 
+@then("the cancellation says it gave back berth {berth}")
+def step_cancellation_freed(context, berth):
+    assert context.result["freed"]["berth"] == berth, context.result
+
+
 @given("the marina charges {cents:d} cents a night from {day}")
 def step_night_rate(context, cents, day):
     context.rates = context.rates + [(_day(day), cents)]

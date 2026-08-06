@@ -111,9 +111,13 @@ def hold(calendar: list, holds: list, hold_ref: str, berth: str, start: dt.date,
 
 
 def cancel(calendar: list, ref: str) -> dict:
-    """Take a booking off the calendar. Cancelling twice is not cancelling twice as
-    hard; the second time is a refusal, because somebody may have taken the nights."""
-    kept = [b for b in calendar if b.ref != ref]
-    if len(kept) == len(calendar):
+    """Take a booking off the calendar and say which nights it gave back.
+
+    Cancelling twice is not cancelling twice as hard; the second time is a refusal,
+    because by then somebody may have taken the nights.
+    """
+    gone = next((b for b in calendar if b.ref == ref), None)
+    if gone is None:
         return {"ok": False, "reason": "no such booking", "calendar": calendar}
-    return {"ok": True, "calendar": kept}
+    return {"ok": True, "calendar": [b for b in calendar if b.ref != ref],
+            "freed": {"berth": gone.berth, "start": gone.start, "end": gone.end}}
