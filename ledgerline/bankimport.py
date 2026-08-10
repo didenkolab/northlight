@@ -106,3 +106,18 @@ def match(lines, invoices) -> dict:
             left.remove(found)
             matched.append({"line": index, "invoice": found["number"]})
     return {"matched": matched, "unmatched": unmatched}
+
+
+def match_by_hand(result: dict, line_index: int, invoice_number: str) -> dict:
+    """A pairing a person made, which the importer would not have guessed.
+
+    Half a practice's payments arrive with the wrong reference or none at all, and the
+    person who knows it is Bergstrom paying three invoices at once should be able to say
+    so once rather than argue with a matcher.
+    """
+    if line_index not in result["unmatched"]:
+        return {"ok": False, "reason": "that line is already matched", **result}
+    return {"ok": True,
+            "matched": result["matched"] + [{"line": line_index, "invoice": invoice_number,
+                                             "by_hand": True}],
+            "unmatched": [i for i in result["unmatched"] if i != line_index]}

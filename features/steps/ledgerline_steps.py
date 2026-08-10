@@ -211,3 +211,16 @@ def step_matched_to(context, numbers):
 @then("line {index:d} is left unmatched")
 def step_line_unmatched(context, index):
     assert index in context.result["unmatched"], context.result
+
+
+@when("a person matches line {index:d} to {number}")
+def step_person_matches(context, index, number):
+    context.result = bankimport.match_by_hand(context.result, index, number)
+
+
+@then("line {index:d} is matched to {number} by hand")
+def step_matched_by_hand(context, index, number):
+    made = [pair for pair in context.result["matched"] if pair["line"] == index]
+    assert made, context.result
+    assert made[0]["invoice"] == number, made
+    assert made[0].get("by_hand") is True, made

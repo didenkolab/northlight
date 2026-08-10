@@ -63,3 +63,5 @@ Feature: Importing a bank statement
       | date       | cents | reference |
       | 2026-07-01 | 45000 | inv 7     |
     Then line 0 is left unmatched
+    When a person matches line 0 to 2026-0007
+    Then line 0 is matched to 2026-0007 by hand
