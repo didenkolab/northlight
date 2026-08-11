@@ -21,3 +21,10 @@ Feature: Checking a guest in from the pontoon
     And ola checks H-1002 in at 11:15
     And the phone finds a signal
     Then the office has H-1001, H-1002 and H-1003 as arrived
+
+  @HARBOR-CHK-003
+  Scenario: The code painted on the berth opens the right booking
+    Given Kittiwake has berth A1 from 2026-07-01 to 2026-07-05 as H-1001
+    And berth A1 is painted with code NL-A1
+    When the crew scan NL-A1 on 2026-07-02
+    Then the scan opens booking H-1001

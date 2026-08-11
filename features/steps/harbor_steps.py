@@ -240,3 +240,19 @@ def step_finds_signal(context):
 @then("the office has {refs} as arrived")
 def step_office_has(context, refs):
     assert context.arrived == _names(refs), context.arrived
+
+
+@given("berth {berth} is painted with code {code}")
+def step_painted_code(context, berth, code):
+    context.codes = {**context.codes, code: berth}
+
+
+@when("the crew scan {code} on {day}")
+def step_scan_code(context, code, day):
+    context.result = checkin.booking_for_code(context.calendar, context.codes, code, _day(day))
+
+
+@then("the scan opens booking {ref}")
+def step_scan_opens(context, ref):
+    assert context.result["ok"], context.result
+    assert context.result["booking_ref"] == ref, context.result

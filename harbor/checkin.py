@@ -41,3 +41,18 @@ def flush(pending: list, arrived) -> dict:
         seen.append(entry.booking_ref)
         applied.append(entry)
     return {"ok": True, "applied": applied, "arrived": seen, "pending": []}
+
+
+def booking_for_code(calendar: list, codes: dict, code: str, night: dt.date) -> dict:
+    """The code painted on the pontoon, and whose booking is on that berth tonight.
+
+    The crew scan it standing next to the boat, so the answer has to be the one booking
+    rather than a search screen with the right one somewhere in it.
+    """
+    berth = codes.get(code)
+    if berth is None:
+        return {"ok": False, "reason": "unknown code"}
+    for taken in calendar:
+        if taken.berth == berth and taken.start <= night < taken.end:
+            return {"ok": True, "booking_ref": taken.ref, "berth": berth}
+    return {"ok": False, "reason": "nothing booked on %s" % berth, "berth": berth}
