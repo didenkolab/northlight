@@ -20,6 +20,7 @@ class Job:
     minutes: int
     address: str
     status: str = "planned"
+    note: str = ""
 
 
 def ends(job: "Job") -> dt.time:
@@ -73,3 +74,19 @@ def move_crew(board: list, job_id: str, crew: str) -> dict:
         return {"ok": False, "reason": "the crew is already out", "clash": clash[0].id,
                 "board": board}
     return {"ok": True, "job": moved, "board": rest + [moved]}
+
+
+def write_up(board: list, job_id: str, note: str, status: str = "done") -> dict:
+    """The crew writes the job up from the van, before it drives off and forgets.
+
+    Written up is finished: the note and the status move together, because a job with a
+    note and no status is one the office has to ring the crew about.
+    """
+    job = next((j for j in board if j.id == job_id), None)
+    if job is None:
+        return {"ok": False, "reason": "no such job", "board": board}
+    if not note.strip():
+        return {"ok": False, "reason": "a write-up says something", "board": board}
+    done = dc.replace(job, note=note.strip(), status=status)
+    return {"ok": True, "job": done,
+            "board": [done if j.id == job_id else j for j in board]}

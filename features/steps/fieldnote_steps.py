@@ -82,6 +82,19 @@ def step_crew_day_is(context, crew, day, ids):
     assert [job.id for job in got] == _names(ids), got
 
 
+@when("{job_id} is written up as {note}")
+def step_written_up(context, job_id, note):
+    context.result = jobs.write_up(context.board, job_id, note)
+    context.board = context.result["board"]
+
+
+@then("{job_id} is done and says {note}")
+def step_done_and_says(context, job_id, note):
+    job = next(j for j in context.board if j.id == job_id)
+    assert job.status == "done", job
+    assert job.note == note, job
+
+
 @given("the roads we know")
 def step_roads_we_know(context):
     context.roads = {(row["from"], row["to"]): int(row["minutes"]) for row in context.table}

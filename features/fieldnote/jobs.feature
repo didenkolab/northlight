@@ -32,3 +32,12 @@ Feature: A crew's day
     When J-1 is handed to the south crew
     Then the job is taken
     And the south crew's day for 2026-07-16 is J-1
+
+  @FIELD-JOB-004
+  Scenario: The crew write the job up from the van
+    Given these jobs are on the board
+      | id  | crew  | day        | start | minutes | address    |
+      | J-1 | north | 2026-07-16 | 14:00 | 60      | Storgata 4 |
+    When J-1 is written up as Replaced the pump and ran it for ten minutes
+    Then the job is taken
+    And J-1 is done and says Replaced the pump and ran it for ten minutes
