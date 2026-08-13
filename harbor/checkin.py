@@ -56,3 +56,14 @@ def booking_for_code(calendar: list, codes: dict, code: str, night: dt.date) -> 
         if taken.berth == berth and taken.start <= night < taken.end:
             return {"ok": True, "booking_ref": taken.ref, "berth": berth}
     return {"ok": False, "reason": "nothing booked on %s" % berth, "berth": berth}
+
+
+def correct(entry: "CheckIn", phone_now: dt.datetime, server_now: dt.datetime) -> "CheckIn":
+    """Move a check-in onto the server's clock, keeping the phone's order.
+
+    A phone that has been off all winter comes back believing it is March. What it is
+    right about is the order things happened in and how far apart they were, so the whole
+    queue is shifted by one difference rather than each entry being stamped with the
+    moment it happened to arrive.
+    """
+    return dc.replace(entry, at=entry.at + (server_now - phone_now))

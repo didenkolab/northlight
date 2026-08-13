@@ -256,3 +256,16 @@ def step_scan_code(context, code, day):
 def step_scan_opens(context, ref):
     assert context.result["ok"], context.result
     assert context.result["booking_ref"] == ref, context.result
+
+
+@step("the phone's clock is put right by {minutes:d} minutes")
+def step_clock_put_right(context, minutes):
+    phone_now = _clock("12:00")
+    context.queue = [checkin.correct(entry, phone_now, phone_now + dt.timedelta(minutes=minutes))
+                     for entry in context.queue]
+
+
+@then("the check-ins are stamped {clocks}")
+def step_checkins_stamped(context, clocks):
+    stamped = [entry.at.strftime("%H:%M") for entry in context.result["applied"]]
+    assert stamped == _names(clocks), stamped

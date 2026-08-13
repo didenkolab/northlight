@@ -28,3 +28,12 @@ Feature: Checking a guest in from the pontoon
     And berth A1 is painted with code NL-A1
     When the crew scan NL-A1 on 2026-07-02
     Then the scan opens booking H-1001
+
+  @HARBOR-CHK-004
+  Scenario: A phone with the wrong clock keeps the order it saw
+    Given the phone has no signal
+    When ola checks H-1001 in at 09:40
+    And ola checks H-1002 in at 10:10
+    And the phone's clock is put right by 95 minutes
+    And the phone finds a signal
+    Then the check-ins are stamped 11:15 and 11:45
