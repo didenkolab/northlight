@@ -121,3 +121,16 @@ def match_by_hand(result: dict, line_index: int, invoice_number: str) -> dict:
             "matched": result["matched"] + [{"line": line_index, "invoice": invoice_number,
                                              "by_hand": True}],
             "unmatched": [i for i in result["unmatched"] if i != line_index]}
+
+
+def decode(raw: bytes, charset: str) -> str:
+    """A statement in whatever character set the bank still writes in.
+
+    One of the three sends its files in a single-byte Nordic set, and a name spelled with
+    an o-slash came into the ledger as a question mark -- which is a customer's name
+    spelled wrong on an invoice, not a display problem.
+    """
+    try:
+        return raw.decode(charset)
+    except (LookupError, UnicodeDecodeError):
+        return raw.decode("utf-8", "replace")

@@ -65,3 +65,7 @@ Feature: Importing a bank statement
     Then line 0 is left unmatched
     When a person matches line 0 to 2026-0007
     Then line 0 is matched to 2026-0007 by hand
+
+  Scenario: A name in the bank's own character set survives the import
+    When the bank's bytes are decoded as latin-1
+    Then the name reads Sørensen

@@ -224,3 +224,13 @@ def step_matched_by_hand(context, index, number):
     assert made, context.result
     assert made[0]["invoice"] == number, made
     assert made[0].get("by_hand") is True, made
+
+
+@when("the bank's bytes are decoded as {charset}")
+def step_decode_bytes(context, charset):
+    context.decoded = bankimport.decode(b"S\xf8rensen", charset)
+
+
+@then("the name reads {name}")
+def step_name_reads(context, name):
+    assert context.decoded == name, context.decoded
