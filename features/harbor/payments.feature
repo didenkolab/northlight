@@ -39,3 +39,8 @@ Feature: What a stay costs and who pays for it
     When H-1001 is confirmed for 18000 cents with intent conf-1
     Then the card has been charged 18000 cents for H-1001
     And the ledger holds 2 charges
+
+  @HARBOR-PAY-006
+  Scenario: A deposit now and the rest on arrival
+    When 18000 cents is split into a 30 per cent deposit
+    Then 5400 cents is taken now and 12600 cents on arrival

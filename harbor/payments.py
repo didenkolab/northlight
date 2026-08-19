@@ -70,3 +70,15 @@ def resume(pending: dict, token: str) -> dict:
     if token not in pending:
         return {"ok": False, "reason": "unknown token"}
     return {"ok": True, "booking_ref": pending[token]}
+
+
+def split_deposit(total_cents: int, percent: int) -> dict:
+    """What is taken now and what is left to pay on arrival.
+
+    The remainder is the total minus the deposit rather than its own percentage, so the
+    two halves always add back up to the price the guest was quoted.
+    """
+    if not 0 < percent < 100:
+        return {"ok": False, "reason": "a deposit is part of the price, not all of it"}
+    now = total_cents * percent // 100
+    return {"ok": True, "now_cents": now, "on_arrival_cents": total_cents - now}

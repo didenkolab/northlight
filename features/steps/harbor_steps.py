@@ -214,6 +214,18 @@ def step_put_back_on(context, ref):
     assert context.result["booking_ref"] == ref, context.result
 
 
+@when("{cents:d} cents is split into a {percent:d} per cent deposit")
+def step_split_deposit(context, cents, percent):
+    context.result = payments.split_deposit(cents, percent)
+
+
+@then("{now:d} cents is taken now and {later:d} cents on arrival")
+def step_deposit_halves(context, now, later):
+    assert context.result["ok"], context.result
+    assert context.result["now_cents"] == now, context.result
+    assert context.result["on_arrival_cents"] == later, context.result
+
+
 @given("the phone has no signal")
 def step_no_signal(context):
     context.queue = []
