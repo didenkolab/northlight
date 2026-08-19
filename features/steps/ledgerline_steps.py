@@ -3,7 +3,7 @@ import datetime as dt
 
 from behave import given, step, then, when
 
-from ledgerline import bankimport, invoices
+from ledgerline import bankimport, invoices, tax
 
 
 def _names(text):
@@ -234,3 +234,15 @@ def step_decode_bytes(context, charset):
 @then("the name reads {name}")
 def step_name_reads(context, name):
     assert context.decoded == name, context.decoded
+
+
+@when("the tax on these lines is worked out {mode}")
+def step_tax_rounding(context, mode):
+    lines = [{"net_cents": int(row["net_cents"]), "tax_percent": int(row["tax_percent"])}
+             for row in context.table]
+    context.tax = tax.rounding(lines, mode)
+
+
+@then("the tax comes to {cents:d} cents")
+def step_tax_comes_to(context, cents):
+    assert context.tax == cents, context.tax
