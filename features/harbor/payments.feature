@@ -44,3 +44,9 @@ Feature: What a stay costs and who pays for it
   Scenario: A deposit now and the rest on arrival
     When 18000 cents is split into a 30 per cent deposit
     Then 5400 cents is taken now and 12600 cents on arrival
+
+  Scenario: A stay of a month or more is priced by the month
+    Given the marina charges 90000 cents a month from 2026-01-01
+    And Kittiwake has berth A1 from 2026-06-01 to 2026-07-01 as H-2001
+    When the invoice for H-2001 is made out as 2026-0044
+    Then the invoice totals 90000 cents

@@ -31,6 +31,7 @@ def step_marina_has_berths(context, names):
     context.calendar = []
     context.holds = []
     context.rates = []
+    context.month_rates = []
     context.ledger = []
     context.tokens = {}
     context.queue = []
@@ -158,10 +159,16 @@ def step_night_rate(context, cents, day):
     context.rates = context.rates + [(_day(day), cents)]
 
 
+@given("the marina charges {cents:d} cents a month from {day}")
+def step_month_rate(context, cents, day):
+    context.month_rates = context.month_rates + [(_day(day), cents)]
+
+
 @when("the invoice for {ref} is made out as {number}")
 def step_invoice_for(context, ref, number):
     made = next(b for b in context.calendar if b.ref == ref)
-    context.invoice = invoice.invoice_for(made, context.rates, number, _day("2026-07-06"))
+    context.invoice = invoice.invoice_for(made, context.rates, number, _day("2026-07-06"),
+                                          context.month_rates)
 
 
 @then("the invoice totals {cents:d} cents")

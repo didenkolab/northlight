@@ -39,10 +39,23 @@ def total_cents(invoice: "Invoice") -> int:
     return sum(line_cents(line) for line in invoice.lines)
 
 
-def invoice_for(booking, rates, number: str, issued: dt.date) -> "Invoice":
-    """One line, for the nights the boat is here, at the rate on the day it was booked."""
+def invoice_for(booking, rates, number: str, issued: dt.date, month_rates=()) -> "Invoice":
+    """The nights the boat is here, at the rates that applied on the day it was booked.
+
+    A stay of four weeks or more is a season, and a season is sold by the month: the
+    marina's month rate is cheaper than thirty nights of the nightly one, which is the
+    whole point of taking a season berth. Whatever is left over after the whole months
+    is charged by the night.
+    """
     stayed = booking_module.nights(booking.start, booking.end)
     night_cents = rate_on(rates, booking.start)
+    if stayed >= SEASON_NIGHTS and month_rates:
+        months, rest = divmod(stayed, MONTH_NIGHTS)
+        lines = [Line("Berth %s, %d months" % (booking.berth, months), months,
+                      rate_on(month_rates, booking.start))]
+        if rest:
+            lines.append(Line("Berth %s, %d nights" % (booking.berth, rest), rest, night_cents))
+        return Invoice(number, booking.ref, tuple(lines), issued)
     line = Line("Berth %s, %d nights" % (booking.berth, stayed), stayed, night_cents)
     return Invoice(number, booking.ref, (line,), issued)
 
@@ -59,3 +72,7 @@ def rate_on(rates, day: dt.date) -> int:
     if not applicable:
         raise ValueError("no rate applies on %s" % day)
     return max(applicable)[1]
+
+
+SEASON_NIGHTS = 28          # from here up, a stay is a season and is priced by the month
+MONTH_NIGHTS = 30
