@@ -28,3 +28,24 @@ def rounding(lines, mode: str) -> int:
             by_rate[line["tax_percent"]] = by_rate.get(line["tax_percent"], 0) + line["net_cents"]
         return sum(round(net * rate / 100) for rate, net in sorted(by_rate.items()))
     raise ValueError("unknown rounding mode %r" % mode)
+
+
+def close_period(ledger: dict, period: str) -> dict:
+    """Close a quarter. Closing one that is already closed changes nothing."""
+    closed = sorted(set(ledger.get("closed", [])) | {period})
+    return {"ok": True, "ledger": {**ledger, "closed": closed}}
+
+
+def book(ledger: dict, entry: dict) -> dict:
+    """Put an entry in the ledger, unless its quarter has gone to the tax office.
+
+    The refusal names the period rather than saying no, because the accountant's next
+    move is to date it into the open quarter and they should not have to work out which
+    one that is.
+    """
+    period = period_of(entry["date"])
+    if period in ledger.get("closed", []):
+        return {"ok": False, "reason": "%s is closed" % period, "period": period,
+                "ledger": ledger}
+    return {"ok": True, "period": period,
+            "ledger": {**ledger, "entries": list(ledger.get("entries", [])) + [entry]}}

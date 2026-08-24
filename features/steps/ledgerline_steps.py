@@ -246,3 +246,20 @@ def step_tax_rounding(context, mode):
 @then("the tax comes to {cents:d} cents")
 def step_tax_comes_to(context, cents):
     assert context.tax == cents, context.tax
+
+
+@given("the quarter {period} is closed")
+def step_quarter_closed(context, period):
+    context.ledger = tax.close_period(context.ledger, period)["ledger"]
+
+
+@when("an entry dated {day} is booked")
+def step_entry_booked(context, day):
+    context.result = tax.book(context.ledger, {"date": _day(day), "cents": 1000})
+    context.ledger = context.result["ledger"]
+
+
+@then("the entry is refused because {reason}")
+def step_entry_refused(context, reason):
+    assert context.result["ok"] is False, context.result
+    assert context.result["reason"] == reason, context.result

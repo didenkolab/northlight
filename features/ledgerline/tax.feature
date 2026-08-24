@@ -22,3 +22,9 @@ Feature: Tax rates, quarters, and closing one
       | 333       | 25          |
       | 333       | 25          |
     Then the tax comes to 250 cents
+
+  @LEDGER-TAX-003
+  Scenario: A closed quarter takes nothing more
+    Given the quarter 2026-Q3 is closed
+    When an entry dated 2026-08-15 is booked
+    Then the entry is refused because 2026-Q3 is closed
