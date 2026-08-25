@@ -82,3 +82,15 @@ def split_deposit(total_cents: int, percent: int) -> dict:
         return {"ok": False, "reason": "a deposit is part of the price, not all of it"}
     now = total_cents * percent // 100
     return {"ok": True, "now_cents": now, "on_arrival_cents": total_cents - now}
+
+
+def refund(ledger: list, booking_ref: str, amount_cents: int, reference: str) -> dict:
+    """Give money back to the card it came from.
+
+    A refund goes into the same ledger as a negative charge, so `charged_cents` stays
+    the one answer to what the guest paid.
+    """
+    if amount_cents <= 0:
+        return {"ok": False, "reason": "a refund is a positive amount", "ledger": ledger}
+    charge = Charge(reference, booking_ref, -amount_cents, "")
+    return {"ok": True, "charge": charge, "ledger": ledger + [charge]}
