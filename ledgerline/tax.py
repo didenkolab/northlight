@@ -49,3 +49,15 @@ def book(ledger: dict, entry: dict) -> dict:
                 "ledger": ledger}
     return {"ok": True, "period": period,
             "ledger": {**ledger, "entries": list(ledger.get("entries", [])) + [entry]}}
+
+
+def rate_on(rates, day: dt.date) -> float:
+    """The tax rate that applied on the day of the invoice.
+
+    A rate that changes in January does not change what was owed in December, and a
+    quarter reopened to correct one line must come out at the same total it did before.
+    """
+    applicable = [(start, percent) for start, percent in rates if start <= day]
+    if not applicable:
+        raise ValueError("no rate applies on %s" % day)
+    return max(applicable)[1]

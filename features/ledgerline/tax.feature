@@ -28,3 +28,9 @@ Feature: Tax rates, quarters, and closing one
     Given the quarter 2026-Q3 is closed
     When an entry dated 2026-08-15 is booked
     Then the entry is refused because 2026-Q3 is closed
+
+  @LEDGER-TAX-004
+  Scenario: The rate that applied on the day of the invoice
+    Given the tax rate was 25 from 2020-01-01 and 22 from 2026-09-01
+    When the rate for 2026-08-31 is looked up
+    Then the rate is 25

@@ -263,3 +263,18 @@ def step_entry_booked(context, day):
 def step_entry_refused(context, reason):
     assert context.result["ok"] is False, context.result
     assert context.result["reason"] == reason, context.result
+
+
+@given("the tax rate was {first:d} from {first_day} and {second:d} from {second_day}")
+def step_tax_rate_history(context, first, first_day, second, second_day):
+    context.tax_rates = [(_day(first_day), first), (_day(second_day), second)]
+
+
+@when("the rate for {day} is looked up")
+def step_rate_looked_up(context, day):
+    context.rate = tax.rate_on(context.tax_rates, _day(day))
+
+
+@then("the rate is {percent:d}")
+def step_rate_is(context, percent):
+    assert context.rate == percent, context.rate
