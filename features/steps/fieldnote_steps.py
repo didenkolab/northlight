@@ -95,6 +95,18 @@ def step_done_and_says(context, job_id, note):
     assert job.note == note, job
 
 
+@when("the arrival window for {job_id} is worked out")
+def step_arrival_window(context, job_id):
+    job = next(j for j in context.board if j.id == job_id)
+    context.window = jobs.arrival_window(job)
+
+
+@then("the window runs from {opens} to {closes}")
+def step_window_runs(context, opens, closes):
+    assert context.window["from"] == _time(opens), context.window
+    assert context.window["to"] == _time(closes), context.window
+
+
 @given("the roads we know")
 def step_roads_we_know(context):
     context.roads = {(row["from"], row["to"]): int(row["minutes"]) for row in context.table}

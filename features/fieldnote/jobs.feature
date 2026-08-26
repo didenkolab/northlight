@@ -41,3 +41,11 @@ Feature: A crew's day
     When J-1 is written up as Replaced the pump and ran it for ten minutes
     Then the job is taken
     And J-1 is done and says Replaced the pump and ran it for ten minutes
+
+  @FIELD-JOB-005
+  Scenario: The customer is promised two hours, not a minute
+    Given these jobs are on the board
+      | id  | crew  | day        | start | minutes | address    |
+      | J-1 | north | 2026-07-16 | 14:00 | 60      | Storgata 4 |
+    When the arrival window for J-1 is worked out
+    Then the window runs from 13:00 to 15:00

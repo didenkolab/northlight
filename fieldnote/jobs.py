@@ -90,3 +90,15 @@ def write_up(board: list, job_id: str, note: str, status: str = "done") -> dict:
     done = dc.replace(job, note=note.strip(), status=status)
     return {"ok": True, "job": done,
             "board": [done if j.id == job_id else j for j in board]}
+
+
+def arrival_window(job: "Job", minutes: int = 120) -> dict:
+    """The two hours we promise the customer, around the time we mean to be there.
+
+    The planned minute sits in the middle rather than at the start, so a crew running
+    half an hour early is still inside the window they were promised instead of knocking
+    on a door nobody is behind yet.
+    """
+    middle = dt.datetime.combine(job.day, job.start)
+    opens = middle - dt.timedelta(minutes=minutes // 2)
+    return {"from": opens.time(), "to": (opens + dt.timedelta(minutes=minutes)).time()}
