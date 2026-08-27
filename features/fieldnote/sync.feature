@@ -61,3 +61,14 @@ Feature: Putting a phone back together with the board
     When the phone and the board are merged
     Then J-1 comes back as done
     And J-1 belongs to the south crew
+
+  Scenario: A job finished offline keeps its photographs
+    Given the board has these jobs
+      | id  | crew  | status  |
+      | J-1 | north | planned |
+    And the phone has these jobs
+      | id  | crew  | status |
+      | J-1 | north | done   |
+    And the phone has photographs P-1, P-2 and P-3 for J-1
+    When the phone and the board are merged
+    Then J-1 comes back with photographs P-1, P-2 and P-3

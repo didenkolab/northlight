@@ -225,3 +225,15 @@ def step_merge_reports(context, job_id, phone_status, board_status):
 def step_belongs_to_crew(context, job_id, crew):
     job = next(j for j in context.merged["jobs"] if j["id"] == job_id)
     assert job["crew"] == crew, job
+
+
+@given("the phone has photographs {ids} for {job_id}")
+def step_phone_photos(context, ids, job_id):
+    context.phone = {**context.phone,
+                     "photos": [{"id": name, "job": job_id} for name in _names(ids)]}
+
+
+@then("{job_id} comes back with photographs {ids}")
+def step_comes_back_with_photos(context, job_id, ids):
+    got = [photo["id"] for photo in context.merged["photos"][job_id]]
+    assert got == _names(ids), got

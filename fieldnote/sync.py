@@ -15,7 +15,7 @@ def merge(phone: dict, server: dict) -> dict:
     otherwise and the board was the record of truth.
 
     Where the two disagree the disagreement is still reported, so the dispatcher can see
-    what was decided for them.
+    what was decided for them. A job's photographs come along with it.
     """
     jobs = {job["id"]: dict(job) for job in server.get("jobs", [])}
     conflicts = []
@@ -35,7 +35,8 @@ def merge(phone: dict, server: dict) -> dict:
             conflicts.append({"id": job["id"], "phone": job.get("status"),
                               "server": theirs.get("status")})
         jobs[job["id"]] = merged
-    return {"jobs": [jobs[key] for key in sorted(jobs)], "conflicts": conflicts}
+    return {"jobs": [jobs[key] for key in sorted(jobs)], "conflicts": conflicts,
+            "photos": {key: photos_for(phone, server, key) for key in sorted(jobs)}}
 
 
 # What each side is the authority on. The crew standing in somebody's garden knows
@@ -63,3 +64,17 @@ def apply_edits(day, pending) -> list:
         if job is not None:
             job[edit["field"]] = edit["value"]
     return [by_id[key] for key in sorted(by_id)]
+
+
+def photos_for(phone: dict, server: dict, job_id: str) -> list:
+    """The photographs of a job, from wherever they have got to.
+
+    The newest one on the phone may still be going up when the merge runs, so it is left
+    for the next sync rather than recorded as arrived and then never sent.
+    """
+    kept = {photo["id"]: photo for photo in server.get("photos", [])
+            if photo["job"] == job_id}
+    on_phone = [photo for photo in phone.get("photos", []) if photo["job"] == job_id]
+    for photo in on_phone[:-1]:
+        kept.setdefault(photo["id"], photo)
+    return [kept[key] for key in sorted(kept)]
