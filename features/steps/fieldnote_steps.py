@@ -148,6 +148,26 @@ def step_plan_is(context, stops):
     assert context.plan == _names(stops), context.plan
 
 
+@given("the crew get there at")
+def step_crew_get_there(context):
+    context.times = [{"stop": row["stop"], "at": _clock(row["at"])} for row in context.table]
+
+
+@given("the last crossings are")
+def step_last_crossings(context):
+    context.ferries = {row["stop"]: _time(row["at"]) for row in context.table}
+
+
+@when("the day is checked against the ferries")
+def step_check_ferries(context):
+    context.missed = routes.ferry_breaks(context.times, context.ferries)
+
+
+@then("the crossing to {stop} is missed")
+def step_crossing_missed(context, stop):
+    assert [entry["stop"] for entry in context.missed] == [stop], context.missed
+
+
 @given("nothing on the phone and nothing on the board")
 def step_nothing_anywhere(context):
     context.phone = {"jobs": [], "photos": []}

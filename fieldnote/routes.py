@@ -59,3 +59,18 @@ def plan_day(depot: str, stops, roads: dict, places: dict) -> list:
     last customer hides an hour of driving from the crew who has to do it.
     """
     return [depot] + order_stops(depot, stops, roads, places) + [depot]
+
+
+def ferry_breaks(times, ferries: dict) -> list:
+    """The crossings the crew would reach after the last boat of the day.
+
+    A plan that puts a stop on the far side at five past six is not a plan, it is a night
+    in a car park, so the legs that cannot be made are handed back and the day is replanned
+    on one side of the water.
+    """
+    missed = []
+    for entry in times:
+        last = ferries.get(entry["stop"])
+        if last is not None and entry["at"].time() > last:
+            missed.append({"stop": entry["stop"], "at": entry["at"], "last_crossing": last})
+    return missed

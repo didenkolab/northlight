@@ -39,3 +39,15 @@ Feature: Ordering a crew's day
       | east  | 40 | 40 |
     When the day through north, west and east is planned from depot
     Then the plan is depot, north, west, east and depot
+
+  @FIELD-RTE-004
+  Scenario: A stop the crew would reach after the last ferry is handed back
+    Given the crew get there at
+      | stop | at    |
+      | west | 15:20 |
+      | isle | 18:40 |
+    And the last crossings are
+      | stop | at    |
+      | isle | 17:45 |
+    When the day is checked against the ferries
+    Then the crossing to isle is missed
