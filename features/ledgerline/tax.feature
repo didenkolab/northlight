@@ -34,3 +34,7 @@ Feature: Tax rates, quarters, and closing one
     Given the tax rate was 25 from 2020-01-01 and 22 from 2026-09-01
     When the rate for 2026-08-31 is looked up
     Then the rate is 25
+
+  Scenario: The last day of March is in the first quarter
+    When the quarter of 2026-03-31 is worked out
+    Then the quarter is 2026-Q1

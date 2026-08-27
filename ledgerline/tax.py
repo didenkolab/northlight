@@ -9,8 +9,14 @@ import datetime as dt
 
 
 def period_of(day: dt.date) -> str:
-    """The quarter a day belongs to."""
-    return "%d-Q%d" % (day.year, day.month // 3 + 1)
+    """The quarter a day belongs to.
+
+    January to March is the first quarter, and that includes the thirty-first of March.
+    Dividing the month number by three put the last day of every quarter into the next
+    one, which is only wrong four days a year and is wrong on the four days an accountant
+    is looking.
+    """
+    return "%d-Q%d" % (day.year, (day.month - 1) // 3 + 1)
 
 
 def rounding(lines, mode: str) -> int:

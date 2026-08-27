@@ -278,3 +278,13 @@ def step_rate_looked_up(context, day):
 @then("the rate is {percent:d}")
 def step_rate_is(context, percent):
     assert context.rate == percent, context.rate
+
+
+@when("the quarter of {day} is worked out")
+def step_quarter_of(context, day):
+    context.quarter = tax.period_of(_day(day))
+
+
+@then("the quarter is {period}")
+def step_quarter_is(context, period):
+    assert context.quarter == period, context.quarter
