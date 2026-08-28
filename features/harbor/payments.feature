@@ -50,3 +50,9 @@ Feature: What a stay costs and who pays for it
     And Kittiwake has berth A1 from 2026-06-01 to 2026-07-01 as H-2001
     When the invoice for H-2001 is made out as 2026-0044
     Then the invoice totals 90000 cents
+
+  @HARBOR-PAY-004
+  Scenario: A refund larger than the invoice it credits is refused
+    Given H-1001 is confirmed for 18000 cents with intent conf-1
+    When 25000 cents are refunded to H-1001
+    Then the refund is refused because more than was charged

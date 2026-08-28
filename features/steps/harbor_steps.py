@@ -233,6 +233,18 @@ def step_deposit_halves(context, now, later):
     assert context.result["on_arrival_cents"] == later, context.result
 
 
+@when("{cents:d} cents are refunded to {ref}")
+def step_refund(context, cents, ref):
+    context.result = payments.refund(context.ledger, ref, cents, "rf-1")
+    context.ledger = context.result["ledger"]
+
+
+@then("the refund is refused because {reason}")
+def step_refund_refused(context, reason):
+    assert context.result["ok"] is False, context.result
+    assert context.result["reason"] == reason, context.result
+
+
 @given("the phone has no signal")
 def step_no_signal(context):
     context.queue = []
