@@ -102,3 +102,17 @@ def arrival_window(job: "Job", minutes: int = 120) -> dict:
     middle = dt.datetime.combine(job.day, job.start)
     opens = middle - dt.timedelta(minutes=minutes // 2)
     return {"from": opens.time(), "to": (opens + dt.timedelta(minutes=minutes)).time()}
+
+
+def move_to(board: list, job_id: str, day: dt.date) -> dict:
+    """Move a job to another day. It leaves the day it was on.
+
+    Both lists are made from the one board here, so a job cannot be on today and
+    tomorrow at once however the phone happens to have cached them.
+    """
+    job = next((j for j in board if j.id == job_id), None)
+    if job is None:
+        return {"ok": False, "reason": "no such job", "board": board}
+    moved = dc.replace(job, day=day)
+    return {"ok": True, "job": moved,
+            "board": [moved if j.id == job_id else j for j in board]}

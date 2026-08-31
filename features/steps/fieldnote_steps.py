@@ -107,6 +107,18 @@ def step_window_runs(context, opens, closes):
     assert context.window["to"] == _time(closes), context.window
 
 
+@when("{job_id} is moved to {day}")
+def step_moved_to_day(context, job_id, day):
+    context.result = jobs.move_to(context.board, job_id, _day(day))
+    context.board = context.result["board"]
+
+
+@then("the {crew} crew's day for {day} holds nothing")
+def step_crew_day_empty(context, crew, day):
+    got = jobs.day_list(context.board, crew, _day(day))
+    assert got == [], got
+
+
 @given("the roads we know")
 def step_roads_we_know(context):
     context.roads = {(row["from"], row["to"]): int(row["minutes"]) for row in context.table}

@@ -49,3 +49,11 @@ Feature: A crew's day
       | J-1 | north | 2026-07-16 | 14:00 | 60      | Storgata 4 |
     When the arrival window for J-1 is worked out
     Then the window runs from 13:00 to 15:00
+
+  Scenario: A job moved to tomorrow leaves today's list
+    Given these jobs are on the board
+      | id  | crew  | day        | start | minutes | address    |
+      | J-1 | north | 2026-07-16 | 14:00 | 60      | Storgata 4 |
+    When J-1 is moved to 2026-07-17
+    Then the north crew's day for 2026-07-16 holds nothing
+    And the north crew's day for 2026-07-17 is J-1
