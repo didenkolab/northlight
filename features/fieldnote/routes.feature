@@ -51,3 +51,12 @@ Feature: Ordering a crew's day
       | isle | 17:45 |
     When the day is checked against the ferries
     Then the crossing to isle is missed
+
+  Scenario: When a job overruns, the rest of the day moves
+    Given the crew get there at
+      | stop | at    |
+      | west | 10:00 |
+      | east | 11:30 |
+      | isle | 13:00 |
+    When west overruns by 45 minutes
+    Then the crew now get there at 10:00, 12:15 and 13:45

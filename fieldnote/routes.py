@@ -61,6 +61,23 @@ def plan_day(depot: str, stops, roads: dict, places: dict) -> list:
     return [depot] + order_stops(depot, stops, roads, places) + [depot]
 
 
+def reflow(times, from_stop: str, overrun_minutes: int) -> list:
+    """A job has overrun. Move the rest of the day rather than breaking it.
+
+    Everything after the stop that ran over shifts by the same amount, which is what the
+    crew is going to experience anyway; replanning the order from where they are standing
+    sends them back past two customers who are already expecting them.
+    """
+    shifted, moving = [], False
+    for entry in times:
+        if moving:
+            entry = {**entry, "at": entry["at"] + dt.timedelta(minutes=overrun_minutes)}
+        shifted.append(entry)
+        if entry["stop"] == from_stop:
+            moving = True
+    return shifted
+
+
 def ferry_breaks(times, ferries: dict) -> list:
     """The crossings the crew would reach after the last boat of the day.
 

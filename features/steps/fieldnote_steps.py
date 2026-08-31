@@ -180,6 +180,17 @@ def step_crossing_missed(context, stop):
     assert [entry["stop"] for entry in context.missed] == [stop], context.missed
 
 
+@when("{stop} overruns by {minutes:d} minutes")
+def step_overruns(context, stop, minutes):
+    context.times = routes.reflow(context.times, stop, minutes)
+
+
+@then("the crew now get there at {clocks}")
+def step_now_get_there(context, clocks):
+    got = [entry["at"].strftime("%H:%M") for entry in context.times]
+    assert got == _names(clocks), got
+
+
 @given("nothing on the phone and nothing on the board")
 def step_nothing_anywhere(context):
     context.phone = {"jobs": [], "photos": []}
