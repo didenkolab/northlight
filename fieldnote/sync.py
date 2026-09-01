@@ -78,3 +78,21 @@ def photos_for(phone: dict, server: dict, job_id: str) -> list:
     for photo in on_phone[:-1]:
         kept.setdefault(photo["id"], photo)
     return [kept[key] for key in sorted(kept)]
+
+
+def dedupe(jobs) -> list:
+    """The same job sent twice from a phone is one job.
+
+    A phone that loses signal halfway through sending has no way of knowing whether the
+    board heard it, so it sends again; what makes the two the same is the id the phone
+    made when the crew created the job, not when either sending arrived. The first one
+    wins, because it is the one anything else may already be pointing at.
+    """
+    seen, kept = set(), []
+    for job in jobs:
+        made_by = job.get("client_id") or job.get("id")
+        if made_by in seen:
+            continue
+        seen.add(made_by)
+        kept.append(job)
+    return kept

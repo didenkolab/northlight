@@ -72,3 +72,12 @@ Feature: Putting a phone back together with the board
     And the phone has photographs P-1, P-2 and P-3 for J-1
     When the phone and the board are merged
     Then J-1 comes back with photographs P-1, P-2 and P-3
+
+  @FIELD-SYN-005
+  Scenario: The same job sent twice from a phone is one job
+    When these sendings are put together
+      | id   | client_id | status |
+      | J-9  | c-77      | done   |
+      | J-10 | c-77      | done   |
+      | J-11 | c-78      | done   |
+    Then what is left is J-9 and J-11

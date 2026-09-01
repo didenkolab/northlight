@@ -260,3 +260,13 @@ def step_phone_photos(context, ids, job_id):
 def step_comes_back_with_photos(context, job_id, ids):
     got = [photo["id"] for photo in context.merged["photos"][job_id]]
     assert got == _names(ids), got
+
+
+@when("these sendings are put together")
+def step_sendings_together(context):
+    context.kept = sync.dedupe([row.as_dict() for row in context.table])
+
+
+@then("what is left is {ids}")
+def step_what_is_left(context, ids):
+    assert [job["id"] for job in context.kept] == _names(ids), context.kept
