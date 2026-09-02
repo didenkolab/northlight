@@ -37,3 +37,9 @@ Feature: Checking a guest in from the pontoon
     And the phone's clock is put right by 95 minutes
     And the phone finds a signal
     Then the check-ins are stamped 11:15 and 11:45
+
+  Scenario: The boat's papers are photographed once, however many times they are taken
+    Given the phone has no signal
+    When ola checks H-1001 in at 09:40
+    And the papers reg-page, reg-page and insurance are photographed for H-1001
+    Then the check-in carries the papers reg-page and insurance

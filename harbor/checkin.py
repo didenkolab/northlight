@@ -17,6 +17,7 @@ class CheckIn:
     at: dt.datetime
     by: str
     source: str = "pontoon"
+    papers: tuple = ()
 
 
 def queue(pending: list, entry: "CheckIn") -> list:
@@ -67,3 +68,14 @@ def correct(entry: "CheckIn", phone_now: dt.datetime, server_now: dt.datetime) -
     moment it happened to arrive.
     """
     return dc.replace(entry, at=entry.at + (server_now - phone_now))
+
+
+def with_papers(entry: "CheckIn", papers) -> "CheckIn":
+    """The boat's papers, photographed at the pontoon.
+
+    Crews photograph the same page twice when the first one looks blurred on a screen in
+    the sun, so the same page named twice is one page and the order they were taken in
+    is kept.
+    """
+    kept = tuple(dict.fromkeys(tuple(entry.papers) + tuple(papers)))
+    return dc.replace(entry, papers=kept)

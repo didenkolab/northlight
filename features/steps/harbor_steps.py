@@ -300,3 +300,14 @@ def step_clock_put_right(context, minutes):
 def step_checkins_stamped(context, clocks):
     stamped = [entry.at.strftime("%H:%M") for entry in context.result["applied"]]
     assert stamped == _names(clocks), stamped
+
+
+@step("the papers {names} are photographed for {ref}")
+def step_papers_taken(context, names, ref):
+    context.queue = [checkin.with_papers(entry, _names(names))
+                     if entry.booking_ref == ref else entry for entry in context.queue]
+
+
+@then("the check-in carries the papers {names}")
+def step_papers_kept(context, names):
+    assert list(context.queue[0].papers) == _names(names), context.queue[0]
