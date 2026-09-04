@@ -4,6 +4,9 @@ version = "0.1.0"
 description = "Harbor, Ledgerline and Fieldnote - the code behind an invented company's vault."
 requires-python = ">=3.11"
 
+[project.optional-dependencies]
+test = ["behave>=1.2.6"]
+
 [tool.setuptools]
 packages = ["harbor", "ledgerline", "fieldnote"]
 
