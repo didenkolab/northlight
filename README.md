@@ -14,7 +14,7 @@ name in it.
 
 ## Quick start
 
-    git clone https://github.com/vadymdidenkolab/northlight.git
+    git clone https://github.com/didenkolab/northlight.git
     cd northlight
     python3 -m venv .venv && .venv/bin/pip install behave
     .venv/bin/behave features
@@ -86,9 +86,9 @@ repositories — the key is how the vault blames a scenario's lines back to a ti
 
 ## Where things are
 
-  * [docket-showcase](https://github.com/vadymdidenkolab/docket-showcase) — the vault: the
+  * [docket-showcase](https://github.com/didenkolab/docket-showcase) — the vault: the
     same team's board, backlog, wiki, and the test results these scenarios produce.
-  * [docket](https://github.com/vadymdidenkolab/docket) — the tracker the vault is kept in.
+  * [docket](https://github.com/didenkolab/docket) — the tracker the vault is kept in.
 
 ## Contributing
 
